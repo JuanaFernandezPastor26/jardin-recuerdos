@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>El Jardín de los Recuerdos — Archivo Colectivo del Duelo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        /* CARGA DIRECTA DE LAS TIPOGRAFÍAS DE OLAFUR SUBIDAS POR EL USUARIO */
+        @font-face {
+            font-family: 'Lineto Circular';
+            src: url('./lineto-circular-book-s.woff2') format('woff2');
+            font-weight: 400;
+            font-style: normal;
+        }
+        @font-face {
+            font-family: 'Lineto Circular';
+            src: url('./lineto-circular-medium-s.woff2') format('woff2');
+            font-weight: 500;
+            font-style: normal;
+        }
+        @font-face {
+            font-family: 'Lineto Circular';
+            src: url('./lineto-circular-bold-s.woff2') format('woff2');
+            font-weight: 700;
+            font-style: normal;
+        }
+
+        body {
+            font-family: 'Lineto Circular', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: #93c5fd; 
+            color: #171717;
+            overflow: hidden;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .circular-book {
+            font-family: 'Lineto Circular', sans-serif;
+            font-weight: 400;
+        }
+        .circular-medium {
+            font-family: 'Lineto Circular', sans-serif;
+            font-weight: 500;
+        }
+        .circular-bold {
+            font-family: 'Lineto Circular', sans-serif;
+            font-weight: 700;
+        }
+
+        .onboarding-screen {
+            transition: opacity 1s cubic-bezier(0.25, 1, 0.5, 1), transform 1s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        ::-webkit-scrollbar {
+            width: 3px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.02);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.12);
+            border-radius: 99px;
+        }
+    </style>
+</head>
+<body class="relative min-h-screen select-none">
+
+    <div id="canvas-container" class="absolute inset-0 w-full h-full z-0 transition-opacity duration-1000"></div>
+
+    <div id="onboarding-1" class="onboarding-screen fixed inset-0 z-50 bg-white/40 backdrop-blur-sm flex flex-col justify-center items-center p-6 text-center">
+        <div class="max-w-4xl flex flex-col justify-center items-center gap-10">
+            <h1 class="text-5xl md:text-8xl circular-medium tracking-tight text-neutral-900 leading-tight">
+                El Jardín de los Recuerdos
+            </h1>
+            
+            <div class="flex flex-col gap-6 max-w-2xl circular-book text-neutral-600">
+                <p class="text-lg md:text-xl leading-relaxed">
+                    Los recuerdos no desaparecen. Solo esperan que alguien vuelva a encontrarlos. <br> <br> Un archivo colectivo y pieza interactiva complementaria al cortometraje surrealista sobre las etapas del duelo.
+                </p>
+            </div>
+            
+            <div class="w-12 h-[2px] bg-neutral-900/20 mt-4 overflow-hidden relative">
+                <div class="absolute inset-0 bg-neutral-900 origin-left animate-[pulse_1.5s_infinite]"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="onboarding-2" class="onboarding-screen fixed inset-0 z-50 bg-white/40 backdrop-blur-sm flex flex-col justify-center items-center p-6 text-center opacity-0 pointer-events-none translate-y-4">
+        <div class="max-w-3xl flex flex-col justify-center items-center gap-12">
+            <div class="flex flex-col gap-8 circular-medium text-neutral-800 text-lg md:text-2xl leading-relaxed">
+                <p>
+                    Haz clic y arrastra tu mouse, o presiona las teclas <span class="bg-neutral-100 border border-neutral-200 px-3 py-1.5 mx-1 rounded text-base">◄</span> <span class="bg-neutral-100 border border-neutral-200 px-3 py-1.5 mx-1 rounded text-base">►</span> para explorar el espacio.
+                </p>
+                <p>
+                    Haz scroll o presiona las teclas <span class="bg-neutral-100 border border-neutral-200 px-3 py-1.5 mx-1 rounded text-base">▲</span> <span class="bg-neutral-100 border border-neutral-200 px-3 py-1.5 mx-1 rounded text-base">▼</span> para avanzar y retroceder en la nube de imágenes.
+                </p>
+            </div>
+
+            <button onclick="finishOnboarding()" class="mt-6 px-10 py-4 bg-neutral-900 hover:bg-neutral-800 text-white rounded-full circular-medium text-xs uppercase tracking-widest transition-all shadow-md">
+                Explorar el Jardín
+            </button>
+        </div>
+    </div>
+
+    <div class="absolute inset-0 pointer-events-none z-10 border border-neutral-900/5 m-4 md:m-8 flex flex-col justify-between">
+        <div class="flex justify-between p-4 border-b border-neutral-900/5 text-[9px] circular-medium tracking-widest text-neutral-500 uppercase">
+            <span>REGISTRO_ATMOSFERICO: ACTIVO // DOSSIER_AI</span>
+            <span>EL_JARDIN_DE_LOS_RECUERDOS (<span id="total-count">0</span>)</span>
+        </div>
+    </div>
+
+    <div class="absolute inset-0 z-20 flex flex-col justify-between px-8 pt-20 pb-6 md:px-12 md:pt-24 md:pb-12 pointer-events-none">
+        <header class="max-w-xl pointer-events-auto flex flex-col gap-2">
+            <h1 class="text-xl md:text-3xl circular-medium tracking-tight text-neutral-900">
+                El Jardín de los Recuerdos.
+            </h1>
+        </header>
+
+        <div class="w-full pointer-events-auto flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mt-auto">
+            <div class="flex flex-col gap-2">
+                <span class="text-[9px] circular-medium uppercase tracking-widest text-neutral-400">Filtrar archivos del duelo:</span>
+                <div class="flex flex-wrap gap-1" id="filter-container">
+                    <button onclick="filterStage('all')" class="filter-btn active px-4 py-2 text-[10px] circular-medium border border-neutral-900/10 bg-neutral-900 text-white hover:bg-neutral-800 transition-all rounded-full uppercase tracking-wider">
+                        Todos
+                    </button>
+                    <button onclick="filterStage('Negación')" class="filter-btn px-4 py-2 text-[10px] circular-medium border border-neutral-900/10 bg-white/70 backdrop-blur text-neutral-700 hover:border-neutral-400 transition-all rounded-full uppercase tracking-wider">
+                        Negación
+                    </button>
+                    <button onclick="filterStage('Ira')" class="filter-btn px-4 py-2 text-[10px] circular-medium border border-neutral-900/10 bg-white/70 backdrop-blur text-neutral-700 hover:border-neutral-400 transition-all rounded-full uppercase tracking-wider">
+                        Ira
+                    </button>
+                    <button onclick="filterStage('Negociación')" class="filter-btn px-4 py-2 text-[10px] circular-medium border border-neutral-900/10 bg-white/70 backdrop-blur text-neutral-700 hover:border-neutral-400 transition-all rounded-full uppercase tracking-wider">
+                        Negociación
+                    </button>
+                    <button onclick="filterStage('Depresión')" class="filter-btn px-4 py-2 text-[10px] circular-medium border border-neutral-900/10 bg-white/70 backdrop-blur text-neutral-700 hover:border-neutral-400 transition-all rounded-full uppercase tracking-wider">
+                        Depresión
+                    </button>
+                    <button onclick="filterStage('Aceptación')" class="filter-btn px-4 py-2 text-[10px] circular-medium border border-neutral-900/10 bg-white/70 backdrop-blur text-neutral-700 hover:border-neutral-400 transition-all rounded-full uppercase tracking-wider">
+                        Aceptación
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2 w-full md:w-auto">
+                <button onclick="openUploadModal()" class="w-full md:w-auto flex items-center justify-center gap-2 px-6 py-3 bg-neutral-900 hover:bg-neutral-800 text-white circular-medium text-[10px] uppercase tracking-widest transition-all rounded-full shadow-md">
+                    <i data-lucide="plus" class="w-3.5 h-3.5"></i> Sembrar Recuerdo
+                </button>
+                <button onclick="resetCamera()" class="p-3 bg-white/80 hover:bg-white border border-neutral-900/10 text-neutral-800 rounded-full transition-all shadow-sm" title="Reajustar Vista">
+                    <i data-lucide="maximize-2" class="w-4 h-4"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="detail-panel" class="fixed top-0 right-0 h-full w-full md:w-[460px] bg-white/95 border-l border-neutral-900/5 z-40 transform translate-x-full transition-transform duration-500 ease-out p-8 flex flex-col justify-between overflow-y-auto pointer-events-auto backdrop-blur-md">
+        <div class="flex flex-col gap-6">
+            <div class="flex justify-between items-center border-b border-neutral-900/5 pb-4">
+                <div class="flex items-center gap-2">
+                    <span id="detail-tag" class="px-3 py-1 text-[9px] circular-medium uppercase bg-amber-500/10 text-amber-800 border border-amber-500/20 rounded-full">Etapa</span>
+                </div>
+                <button onclick="closeDetailPanel()" class="text-neutral-500 hover:text-neutral-900 transition-all p-1">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <div id="detail-image-wrapper" class="w-full aspect-[4/3] bg-neutral-100 overflow-hidden border border-neutral-900/5 rounded-lg relative">
+                <img id="detail-image" src="" alt="Símbolo de Duelo" class="w-full h-full object-cover">
+                <div class="absolute inset-0 bg-gradient-to-t from-white/10 to-transparent"></div>
+            </div>
+
+            <div class="flex flex-col gap-4">
+                <p id="detail-text" class="circular-book text-lg md:text-xl text-neutral-800 italic leading-relaxed">
+                    "Aquí se proyectará el recuerdo seleccionado."
+                </p>
+                <div class="h-[1px] bg-neutral-900/5 w-1/4"></div>
+                <div class="flex flex-col gap-1 text-[10px] circular-medium text-neutral-400">
+                    <span id="detail-author">— Anónimo</span>
+                    <span id="detail-date">Sembrado el 10/07/2026</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-8 pt-4 border-t border-neutral-900/5 flex items-center justify-between text-[9px] circular-medium text-neutral-400">
+            <span>MEMORIA_SITUACIONAL_SISTEMA</span>
+            <span id="detail-id">#001</span>
+        </div>
+    </div>
+
+    <div id="upload-modal" class="fixed inset-0 bg-neutral-900/30 backdrop-blur-sm z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="bg-white border border-neutral-900/5 w-full max-w-lg rounded-2xl p-6 md:p-8 flex flex-col gap-6 transform scale-95 transition-transform duration-300 max-h-[90vh] overflow-y-auto shadow-2xl">
+            <div class="flex justify-between items-center border-b border-neutral-900/5 pb-4">
+                <h2 class="text-lg circular-medium text-neutral-900">Sembrar recuerdo en el Jardín</h2>
+                <button onclick="closeUploadModal()" class="text-neutral-400 hover:text-neutral-900 transition-all">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+ 
+            <form id="memory-form" class="flex flex-col gap-5" onsubmit="handleFormSubmit(event)">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div class="flex flex-col gap-1">
+                        <label class="text-[9px] circular-medium uppercase tracking-wider text-neutral-400">Subí tu recuerdo</label>
+                        <div class="border border-dashed border-neutral-900/15 hover:border-neutral-900/30 rounded-xl p-4 text-center cursor-pointer relative bg-neutral-50 transition-all group h-full min-h-[140px] flex items-center justify-center" id="drop-zone">
+                            <input type="file" id="form-file" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" onchange="previewImage(event)">
+                            <div class="flex flex-col items-center gap-2 text-neutral-400" id="preview-placeholder">
+                                <i data-lucide="image" class="w-8 h-8 stroke-1 text-neutral-400 group-hover:text-amber-500 transition-colors"></i>
+                                <span class="text-xs circular-medium">Arrastra o selecciona un archivo</span>
+                                <span class="text-[9px] text-neutral-400">JPG, PNG o WEBP (Máx. 5MB)</span>
+                                <span class="text-[9px] text-neutral-300">Opcional: puedes sembrar solo texto</span>
+                            </div>
+                            <div class="hidden flex-col items-center gap-2" id="preview-container">
+                                <img id="image-preview" src="" class="h-20 w-auto object-cover rounded-lg border border-neutral-900/10 grayscale">
+                                <span class="text-[9px] circular-medium text-emerald-600">Archivo listo</span>
+                            </div>
+                        </div>
+                    </div>
+ 
+                    <div class="flex flex-col gap-1">
+                        <label class="text-[9px] circular-medium uppercase tracking-wider text-neutral-400">Recuerdo en palabras</label>
+                        <textarea id="form-text" required rows="6" placeholder="Describí el recuerdo de la foto, o escribí ese recuerdo que no se puede ver pero que sí habita en tu memoria" class="w-full h-full min-h-[140px] bg-neutral-50 border border-neutral-900/10 rounded-xl p-3 text-xs text-neutral-800 placeholder-neutral-400 focus:outline-none focus:border-neutral-400 transition-all font-light resize-none"></textarea>
+                    </div>
+                </div>
+ 
+                <div class="flex flex-col gap-1">
+                    <label class="text-[9px] circular-medium uppercase tracking-wider text-neutral-400">Dimensión de Duelo</label>
+                    <select id="form-stage" required class="w-full bg-neutral-50 border border-neutral-900/10 rounded-xl p-3 text-xs text-neutral-800 focus:outline-none focus:border-neutral-400 circular-medium transition-all">
+                        <option value="Asignación">Elegir o será asignado automáticamente</option>
+                        <option value="Negación">Negación</option>
+                        <option value="Ira">Ira</option>
+                        <option value="Negociación">Negociación</option>
+                        <option value="Depresión">Depresión</option>
+                        <option value="Aceptación">Aceptación</option>
+                    </select>
+                </div>
+ 
+                <div class="flex flex-col gap-1">
+                    <label class="text-[9px] circular-medium uppercase tracking-wider text-neutral-400">Firma</label>
+                    <input type="text" id="form-author" placeholder="Anónimo / Iniciales" class="w-full bg-neutral-50 border border-neutral-900/10 rounded-xl p-2.5 text-xs text-neutral-800 placeholder-neutral-400 focus:outline-none focus:border-neutral-400 transition-all circular-medium">
+                </div>
+ 
+                <button type="submit" id="submit-memory-btn" class="mt-2 w-full py-3.5 bg-neutral-900 text-white circular-medium text-[10px] uppercase tracking-widest font-semibold hover:bg-neutral-800 transition-all rounded-full shadow-lg">
+                    Sembrar en el Jardín
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div class="fixed top-20 md:top-24 right-8 md:right-12 z-30 pointer-events-auto flex items-center gap-2 bg-white/80 border border-neutral-900/5 rounded-full px-3 py-1.5 backdrop-blur-md shadow-sm">
+        <span class="text-[9px] circular-medium tracking-wider text-neutral-600 uppercase" id="sound-status">Audio: OFF</span>
+        <button onclick="toggleAmbientAudio()" class="w-6 h-6 flex items-center justify-center text-neutral-600 hover:text-neutral-900 transition-all rounded-full bg-neutral-100">
+            <i data-lucide="volume-x" class="w-3 h-3" id="sound-icon"></i>
+        </button>
+    </div>
+
+    <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-neutral-900 border border-neutral-900/10 px-4 py-3 rounded-full circular-medium text-xs text-white tracking-wider flex items-center gap-3 opacity-0 pointer-events-none transition-all duration-300 shadow-xl">
+        <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i>
+        <span id="toast-message">Recuerdo sembrado</span>
+    </div>
+
+    <script>
+        // --- BASE DE DATOS MOCKUP ---
+        // --- BASE DE DATOS MOCKUP AMPLIADA (EL TRIPLE DE DATOS) ---
+        // Nota: Para usar tus propias imágenes, crea una carpeta llamada 'imagenes' 
+        // en el mismo directorio que este archivo HTML y guarda allí tus archivos (foto1.jpg, foto2.png, etc.)
+        const INITIAL_MEMORIES = [
+            // --- BLOQUE 1: Tus imágenes locales asociadas a la identidad del proyecto ---
+            {
+                id: "1",
+                stage: "Negación",
+                author: "Estanislao",
+                text: "Aún programo la alarma a las 07:00 am para que suene del lado derecho del colchón. Me resisto a aceptar que el silencio ahora es quien duerme allí.",
+                image: "imagenes/foto1.jpg", // <--- Apesta a tu carpeta local de imágenes
+                date: "10 de Julio, 2026",
+                isTextOnly: false
+            },
+            {
+                id: "2",
+                stage: "Ira",
+                author: "Camila R.",
+                text: "Encontré tus llaves duplicadas en el cajón del pasillo. Me dio tanta rabia que todavía conserven tu forma y tu brillo intacto mientras vos ya no estás.",
+                image: "imagenes/foto2.jpg", // <--- Segunda foto local
+                date: "12 de Julio, 2026",
+                isTextOnly: false
+            },
+            {
+                id: "3",
+                stage: "Negociación",
+                author: "Julián",
+                text: "Si guardo cada uno de tus abrigos sin lavarlos, ¿el tiempo se va a quedar congelado en el último día que los usaste?",
+                image: "imagenes/foto3.jpg", // <--- Tercera foto local
+                date: "13 de Julio, 2026",
+                isTextOnly: false
+            },
+            {
+                id: "4",
+                stage: "Depresión",
+                author: "Anónimo",
+                text: "La tarde cae gris sobre el ventanal del living. Todo el ruido de la ciudad se siente lejano, como si yo estuviera sumergido bajo diez metros de agua mansa.",
+                image: "imagenes/foto4.jpg", // <--- Cuarta foto local
+                date: "14 de Julio, 2026",
+                isTextOnly: false
+            },
+            {
+                id: "5",
+                stage: "Aceptación",
+                author: "Sofía de la Vega",
+                text: "Crucé la plaza donde solíamos sentarnos y por primera vez en meses el pecho no me dolió. Recordarte ya no se siente como una herida, sino como un refugio.",
+                image: "imagenes/foto5.jpg", // <--- Quinta foto local
+                date: "15 de Julio, 2026",
+                isTextOnly: false
+            },
+
+            // --- BLOQUE 2: Recuerdos de Texto Puro (Sin imagen) ---
+            { id: "6", stage: "Negación", author: "Marta", text: "El olor a café recién molido en la casa de mi abuela los domingos.", image: null, date: "12 de Julio, 2026", isTextOnly: true },
+            { id: "7", stage: "Aceptación", author: "Anónimo", text: "La ruta al mar un mapa arrugado en la guantera.", image: null, date: "11 de Julio, 2026", isTextOnly: true },
+            { id: "8", stage: "Ira", author: "J. M.", text: "Mi primera computadora de escritorio, el zumbido del monitor prehistórico.", image: null, date: "10 de Julio, 2026", isTextOnly: true },
+            { id: "9", stage: "Depresión", author: "Lucas", text: "La taza de té dejada a la mitad en la mesita de luz.", image: null, date: "09 de Julio, 2026", isTextOnly: true },
+            { id: "10", stage: "Negociación", author: "Elena", text: "Intercambiaría todos mis libros leídos por volver a escuchar tu risa apurada.", image: null, date: "08 de Julio, 2026", isTextOnly: true },
+
+            // --- BLOQUE 3: Unsplash e historias expandidas ---
+            {
+                id: "11",
+                stage: "Negación",
+                author: "Victoria",
+                text: "Busco tus ojos en las ventanillas de los trenes en hora pico. Todos los rostros borrosos tienen por un milisegundo tu misma sonrisa helada.",
+                image: "https://images.unsplash.com/photo-1517256064527-09c53b2d0bc6?q=80&w=600&auto=format&fit=crop",
+                date: "08 de Julio, 2026",
+                isTextOnly: false
+            },
+            {
+                id: "12",
+                stage: "Negación",
+                author: "Anónimo",
+                text: "La cafetera gotea exactamente dos tazas todas las mañanas. Me niego a vaciar la tuya, prefiero ver cómo se enfría hasta que el día oscurece.",
+                image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?q=80&w=600&auto=format&fit=crop",
+                date: "06 de Julio, 2026",
+                isTextOnly: false
+            },
+            {
+                id: "13",
+                stage: "Ira",
+                author: "Ramón V.",
+                text: "Le grito al mar porque sigue rompiendo en la orilla con esa rítmica calma absurda, mientras mi mundo entero se ha fracturado sin posibilidad de arreglo.",
+                image: "https://images.unsplash.com/photo-1518156677180-95a2893f3e9f?q=80&w=600&auto=format&fit=crop",
+                date: "29 de Junio, 2026",
+                isTextOnly: false
+            },
+            {
+                id: "14",
+                stage: "Ira",
+                author: "Anónimo",
+                text: "Odio las risas ajenas en el café de la esquina. ¿Cómo se atreven a seguir viviendo como si no hubiese desaparecido la única luz del día?",
+                image: "https://images.unsplash.com/photo-1478760329108-5c3ed9d495a0?q=80&w=600&auto=format&fit=crop",
+                date: "27 de Junio, 2026",
+                isTextOnly: false
+            },
+            {
+                id: "15",
+                stage: "Negociación",
+                author: "Leonel",
+                text: "Hago tratos con las estrellas apagadas: les ofrezco todos mis mañanas a cambio de que me devuelvan una sola de tus tardes de lluvia.",
+                image: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?q=80&w=600&auto=format&fit=crop",
+                date: "17 de Junio, 2026",
+                isTextOnly: false
+            },
+            {
+                id: "16",
+                stage: "Depresión",
+                author: "Lucía D.",
+                text: "Hay una niebla espesa y pálida dentro de mi pecho. No hace frío, pero mis costillas tiemblan como si estuvieran hechas de papel mojado.",
+                image: "https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?q=80&w=600&auto=format&fit=crop",
+                date: "05 de Junio, 2026",
+                isTextOnly: false
+            },
+            {
+                id: "17",
+                stage: "Aceptación",
+                author: "Gaby",
+                text: "Hoy el viento sopló y no dolió. Dejé abierta la ventana para que entre la primavera y sentí que tu recuerdo ya no me ahogaba, sino que me hacía flotar.",
+                image: "https://images.unsplash.com/photo-1426604966848-d7adac402bff?q=80&w=600&auto=format&fit=crop",
+                date: "23 de Mayo, 2026",
+                isTextOnly: false
+            },
+            {
+                id: "18",
+                stage: "Negociación",
+                author: "Marcos T.",
+                text: "Si prometo ser mejor persona de ahora en adelante, ¿existirá alguna dimensión paralela donde los minutos retrocedan antes del accidente?",
+                image: "https://images.unsplash.com/photo-1461360370896-922624d12aa1?q=80&w=600&auto=format&fit=crop",
+                date: "02 de Junio, 2026",
+                isTextOnly: false
+            },
+            {
+                id: "19",
+                stage: "Depresión",
+                author: "Clara S.",
+                text: "Todo lo que hago me cuesta el doble de energía. Despertarse es un ejercicio de resistencia contra el peso de tu ausencia.",
+                image: "https://images.unsplash.com/photo-1499209974431-9dddcece7f88?q=80&w=600&auto=format&fit=crop",
+                date: "14 de Mayo, 2026",
+                isTextOnly: false
+            },
+            {
+                id: "20",
+                stage: "Aceptación",
+                author: "Mateo",
+                text: "La vida continuó, de otra manera y con un vacío de fondo, pero continuó. Hoy volví a sonreír de verdad al mirar tu retrato en la biblioteca.",
+                image: "https://images.unsplash.com/photo-1504198453319-5ce911bafcde?q=80&w=600&auto=format&fit=crop",
+                date: "20 de Mayo, 2026",
+                isTextOnly: false
+            }
+        ];
+
+        let memories = [...INITIAL_MEMORIES];
+        let currentFilter = 'all';
+
+        let scene, camera, renderer, container;
+        let nodes = []; 
+        let particles;
+        let isDragging = false;
+        let previousMousePosition = { x: 0, y: 0 };
+        let targetRotation = { x: 0.1, y: 0.4 };
+        let currentRotation = { x: 0.1, y: 0.4 };
+        let targetZoom = 19;
+        let currentZoom = 45;
+        let raycaster, mouse;
+        let hoveredNode = null;
+        let audioCtx; 
+
+        let mouseParallax = { x: 0, y: 0 };
+        let targetParallax = { x: 0, y: 0 };
+
+        function nextOnboarding() {
+            document.getElementById('onboarding-1').classList.add('opacity-0', 'pointer-events-none', '-translate-y-4');
+            setTimeout(() => {
+                document.getElementById('onboarding-2').classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
+            }, 300);
+        }
+
+        function finishOnboarding() {
+            document.getElementById('onboarding-2').classList.add('opacity-0', 'pointer-events-none', '-translate-y-4');
+            setTimeout(() => {
+                document.getElementById('onboarding-2').style.display = 'none';
+            }, 800);
+        }
+
+        window.onload = function() {
+            lucide.createIcons();
+            initThree();
+            setupEvents();
+            updateTotalCount();
+            
+            // Transición automática de Pantalla 1 a Pantalla 2 tras un delay de 4 segundos
+            setTimeout(nextOnboarding, 4000);
+        };
+
+        function updateTotalCount() {
+            document.getElementById('total-count').textContent = memories.length;
+        }
+
+        function initThree() {
+            container = document.getElementById('canvas-container');
+            
+            scene = new THREE.Scene();
+            scene.fog = new THREE.FogExp2(0xffffff, 0.012);
+
+            camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+            updateCameraPosition();
+
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            container.appendChild(renderer.domElement);
+
+            create3DSkydome();
+
+            const ambientLight = new THREE.AmbientLight(0xfffbeb, 0.7);
+            scene.add(ambientLight);
+
+            const directionalLight = new THREE.DirectionalLight(0xfef08a, 0.5);
+            directionalLight.position.set(10, 25, 20);
+            scene.add(directionalLight);
+
+            const particleGeo = new THREE.BufferGeometry();
+            const particleCount = 500;
+            const posArray = new Float32Array(particleCount * 3);
+
+            for(let i=0; i < particleCount * 3; i++) {
+                posArray[i] = (Math.random() - 0.5) * 110;
+            }
+
+            particleGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+            
+            const particleMat = new THREE.PointsMaterial({
+                size: 0.12,
+                color: 0x93c5fd, 
+                transparent: true,
+                opacity: 0.45
+            });
+
+            particles = new THREE.Points(particleGeo, particleMat);
+            scene.add(particles);
+
+            raycaster = new THREE.Raycaster();
+            mouse = new THREE.Vector2();
+
+            buildMemorySpace();
+            animate();
+        }
+
+        function create3DSkydome() {
+            const skyGeo = new THREE.SphereGeometry(180, 32, 32);
+
+            const vertexShader = `
+                varying vec3 vPosition;
+                void main() {
+                    vPosition = position;
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                }
+            `;
+
+            const fragmentShader = `
+                varying vec3 vPosition;
+                void main() {
+                    float h = normalize(vPosition).y;
+                    vec3 celestePuro = vec3(147.0/255.0, 197.0/255.0, 253.0/255.0);
+                    vec3 celesteClaro = vec3(219.0/255.0, 234.0/255.0, 254.0/255.0);
+                    vec3 blancoMisty = vec3(1.0, 1.0, 1.0);
+                    vec3 amarilloHorizonte = vec3(190.0/255.0, 215.0/255.0, 131.0/255.0);
+                    
+                    vec3 finalColor;
+                    float absH = abs(h);
+                    
+                    if (absH < 0.12) {
+                        finalColor = mix(amarilloHorizonte, blancoMisty, absH / 0.12);
+                    } else if (absH < 0.45) {
+                        finalColor = mix(blancoMisty, celesteClaro, (absH - 0.12) / 0.33);
+                    } else {
+                        finalColor = mix(celesteClaro, celestePuro, (absH - 0.45) / 0.55);
+                    }
+                    gl_FragColor = vec4(finalColor, 1.0);
+                }
+            `;
+
+            const skyMat = new THREE.ShaderMaterial({
+                vertexShader: vertexShader,
+                fragmentShader: fragmentShader,
+                side: THREE.BackSide,
+                depthWrite: false
+            });
+
+            const skydome = new THREE.Mesh(skyGeo, skyMat);
+            scene.add(skydome);
+        }
+
+        function buildMemorySpace() {
+            nodes.forEach(node => scene.remove(node.mesh));
+            nodes = [];
+
+            memories.forEach((memory, idx) => {
+                const phi = Math.acos(-1 + (2 * idx) / memories.length);
+                const theta = Math.sqrt(memories.length * Math.PI) * phi;
+                
+                const radius = 13 + Math.random() * 4;
+                const x = radius * Math.sin(phi) * Math.cos(theta);
+                const y = radius * Math.sin(phi) * Math.sin(theta) * 0.42; 
+                const z = radius * Math.cos(phi);
+
+                let geometry;
+                let material;
+                let texture = null;
+
+                if (memory.isTextOnly || !memory.image) {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = 512;
+                    canvas.height = 128;
+                    const ctx = canvas.getContext('2d');
+                    
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.fillStyle = '#171717';
+                    ctx.font = '500 24px -apple-system, sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    
+                    let txt = memory.text;
+                    if(txt.length > 45) txt = txt.substring(0, 42) + "...";
+                    
+                    ctx.fillText(txt, canvas.width / 2, canvas.height / 2);
+                    
+                    texture = new THREE.CanvasTexture(canvas);
+                    geometry = new THREE.PlaneGeometry(4.5, 1.125);
+                    
+                    material = new THREE.MeshBasicMaterial({
+                        map: texture,
+                        side: THREE.DoubleSide,
+                        transparent: true,
+                        opacity: 0.95
+                    });
+                } else {
+                    const textureLoader = new THREE.TextureLoader();
+                    textureLoader.crossOrigin = "anonymous";
+                    
+                    try {
+                        texture = textureLoader.load(memory.image);
+                    } catch(e) {}
+
+                    geometry = new THREE.PlaneGeometry(3.6, 2.7);
+                    material = new THREE.MeshBasicMaterial({
+                        map: texture,
+                        side: THREE.DoubleSide,
+                        color: 0xffffff,
+                        transparent: true,
+                        opacity: 0.85
+                    });
+
+                    if(!texture) material.color.setHex(0xe5e5e5);
+                }
+
+                const mesh = new THREE.Mesh(geometry, material);
+                mesh.position.set(x, y, z);
+                mesh.lookAt(0, 0, 0); 
+                
+                mesh.userData = { 
+                    id: memory.id, 
+                    stage: memory.stage,
+                    text: memory.text,
+                    author: memory.author,
+                    date: memory.date,
+                    image: memory.image,
+                    isTextOnly: memory.isTextOnly,
+                    originalPos: new THREE.Vector3(x, y, z),
+                    targetPos: new THREE.Vector3(x, y, z),
+                    scale: 1
+                };
+
+                const edges = new THREE.EdgesGeometry(geometry);
+                const lineMat = new THREE.LineBasicMaterial({ 
+                    color: 0x171717, 
+                    transparent: true, 
+                    opacity: (memory.isTextOnly ? 0.03 : 0.15) 
+                });
+                const line = new THREE.LineSegments(edges, lineMat);
+                mesh.add(line);
+
+                scene.add(mesh);
+                nodes.push({
+                    mesh: mesh,
+                    material: material,
+                    line: line,
+                    data: memory
+                });
+            });
+        }
+
+        function updateCameraPosition() {
+            const posX = currentZoom * Math.sin(currentRotation.y) * Math.cos(currentRotation.x) + targetParallax.x;
+            const posY = currentZoom * Math.sin(currentRotation.x) + targetParallax.y;
+            const posZ = currentZoom * Math.cos(currentRotation.y) * Math.cos(currentRotation.x);
+
+            camera.position.set(posX, posY, posZ);
+            camera.lookAt(0, 0, 0);
+        }
+
+        function resetCamera() {
+            targetRotation.x = 0.1;
+            targetRotation.y = 0.4;
+            targetZoom = 19;
+            targetParallax.x = 0;
+            targetParallax.y = 0;
+            playChime(329.63, 'sine', 0.1); 
+        }
+
+        function filterStage(stage) {
+            currentFilter = stage;
+            const buttons = document.querySelectorAll('.filter-btn');
+            buttons.forEach(btn => {
+                btn.classList.remove('active', 'bg-neutral-900', 'text-white');
+                btn.classList.add('bg-white/70', 'text-neutral-700');
+            });
+
+            event.target.classList.add('active', 'bg-neutral-900', 'text-white');
+            event.target.classList.remove('bg-white/70', 'text-neutral-700');
+
+            let visibleIndex = 0;
+            nodes.forEach(node => {
+                const isVisible = (stage === 'all' || node.data.stage === stage);
+                if (isVisible) {
+                    node.mesh.visible = true;
+                    const phi = Math.acos(-1 + (2 * visibleIndex) / memories.filter(m => stage === 'all' || m.stage === stage).length);
+                    const theta = Math.sqrt(memories.length * Math.PI) * phi;
+                    const radius = 12 + Math.random() * 3;
+                    
+                    node.mesh.userData.targetPos.set(
+                        radius * Math.sin(phi) * Math.cos(theta),
+                        radius * Math.sin(phi) * Math.sin(theta) * 0.42,
+                        radius * Math.cos(phi)
+                    );
+                    node.mesh.userData.scale = 1.0;
+                    visibleIndex++;
+                } else {
+                    node.mesh.userData.targetPos.set(0, -35, 0); 
+                    node.mesh.userData.scale = 0.0;
+                }
+            });
+            playChime(220, 'triangle', 0.1);
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            currentRotation.x += (targetRotation.x - currentRotation.x) * 0.05;
+            currentRotation.y += (targetRotation.y - currentRotation.y) * 0.05;
+            currentZoom += (targetZoom - currentZoom) * 0.05;
+
+            targetParallax.x += (mouseParallax.x - targetParallax.x) * 0.04;
+            targetParallax.y += (mouseParallax.y - targetParallax.y) * 0.04;
+
+            updateCameraPosition();
+
+            if (particles) {
+                particles.rotation.y += 0.0001;
+                particles.rotation.x += 0.00005;
+            }
+
+            nodes.forEach((node, idx) => {
+                node.mesh.position.lerp(node.mesh.userData.targetPos, 0.04);
+
+                const currentScale = node.mesh.scale.x;
+                const targetScale = node.mesh.userData.scale;
+                const newScale = currentScale + (targetScale - currentScale) * 0.08;
+                node.mesh.scale.set(newScale, newScale, newScale);
+
+                if(newScale < 0.05 && node.mesh.userData.scale === 0) {
+                    node.mesh.visible = false;
+                }
+
+                if (node.mesh.visible) {
+                    const time = Date.now() * 0.0008;
+                    const offset = parseInt(node.mesh.userData.id) || idx * 0.3;
+                    node.mesh.position.y += Math.sin(time + offset) * 0.003;
+                }
+                node.mesh.lookAt(camera.position);
+            });
+
+            renderer.render(scene, camera);
+        }
+
+        function setupEvents() {
+            container.addEventListener('mousedown', onMouseDown);
+            container.addEventListener('mousemove', onMouseMove);
+            window.addEventListener('mouseup', onMouseUp);
+            container.addEventListener('wheel', onDocumentWheel, { passive: false });
+            container.addEventListener('touchstart', onTouchStart, { passive: true });
+            container.addEventListener('touchmove', onTouchMove, { passive: false });
+            container.addEventListener('touchend', onTouchEnd);
+            container.addEventListener('click', onCanvasClick);
+            window.addEventListener('resize', onWindowResize);
+            window.addEventListener('mousemove', onScreenMouseMove);
+            window.addEventListener('keydown', onKeyDown);
+
+            const dropZone = document.getElementById('drop-zone');
+            dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('bg-neutral-100'); });
+            dropZone.addEventListener('dragleave', () => { dropZone.classList.remove('bg-neutral-100'); });
+            dropZone.addEventListener('drop', (e) => { e.preventDefault(); dropZone.classList.remove('bg-neutral-100'); });
+        }
+
+        function onScreenMouseMove(e) {
+            mouseParallax.x = -((e.clientX / window.innerWidth) - 0.5) * 4.5;
+            mouseParallax.y = ((e.clientY / window.innerHeight) - 0.5) * 3.5;
+        }
+
+        function onMouseDown(e) { isDragging = true; previousMousePosition = { x: e.clientX, y: e.clientY }; }
+        function onMouseMove(e) {
+            if (!isDragging) { checkHover(e.clientX, e.clientY); return; }
+            const deltaMove = { x: e.clientX - previousMousePosition.x, y: e.clientY - previousMousePosition.y };
+            targetRotation.y -= deltaMove.x * 0.005;
+            targetRotation.x = Math.max(-Math.PI/3.5, Math.min(Math.PI/3.5, targetRotation.x - deltaMove.y * 0.005));
+            previousMousePosition = { x: e.clientX, y: e.clientY };
+        }
+        function onMouseUp() { isDragging = false; }
+        function onDocumentWheel(e) { e.preventDefault(); targetZoom = Math.max(10, Math.min(50, targetZoom + e.deltaY * 0.03)); }
+
+        let touchStartDist = 0;
+        function onTouchStart(e) {
+            isDragging = true;
+            if (e.touches.length === 1) previousMousePosition = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+            else if (e.touches.length === 2) touchStartDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+        }
+        function onTouchMove(e) {
+            if (!isDragging) return;
+            e.preventDefault();
+            if (e.touches.length === 1) {
+                const deltaMove = { x: e.touches[0].clientX - previousMousePosition.x, y: e.touches[0].clientY - previousMousePosition.y };
+                targetRotation.y -= deltaMove.x * 0.006;
+                targetRotation.x = Math.max(-Math.PI/3.5, Math.min(Math.PI/3.5, targetRotation.x - deltaMove.y * 0.006));
+                previousMousePosition = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+            } else if (e.touches.length === 2) {
+                const dist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+                targetZoom = Math.max(10, Math.min(50, targetZoom + (touchStartDist - dist) * 0.15));
+                touchStartDist = dist;
+            }
+        }
+        function onTouchEnd() { isDragging = false; }
+        function onKeyDown(e) {
+            if (e.key === 'ArrowLeft') targetRotation.y -= 0.15;
+            else if (e.key === 'ArrowRight') targetRotation.y += 0.15;
+            else if (e.key === 'ArrowUp') targetZoom = Math.max(10, targetZoom - 2);
+            else if (e.key === 'ArrowDown') targetZoom = Math.min(50, targetZoom + 2);
+        }
+
+        function checkHover(clientX, clientY) {
+            mouse.x = (clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(clientY / window.innerHeight) * 2 + 1;
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(nodes.map(n => n.mesh));
+
+            if (intersects.length > 0) {
+                const hitNode = intersects[0].object;
+                if (hoveredNode !== hitNode) {
+                    if (hoveredNode) resetNodeVisual(hoveredNode);
+                    hoveredNode = hitNode;
+                    hitNode.material.opacity = 1.0;
+                    hitNode.children[0].material.opacity = 0.8;
+                    hitNode.children[0].material.color.setHex(0xf59e0b); 
+                    document.body.style.cursor = 'pointer';
+                }
+            } else {
+                if (hoveredNode) { resetNodeVisual(hoveredNode); hoveredNode = null; }
+                document.body.style.cursor = 'default';
+            }
+        }
+
+        function resetNodeVisual(node) {
+            if (!node) return;
+            node.material.opacity = node.userData.isTextOnly ? 0.95 : 0.85;
+            if (node.children[0]) {
+                node.children[0].material.opacity = node.userData.isTextOnly ? 0.03 : 0.15;
+                node.children[0].material.color.setHex(0x171717);
+            }
+        }
+
+        function onCanvasClick(e) {
+            if (isDragging) return;
+            mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(nodes.map(n => n.mesh));
+
+            if (intersects.length > 0) {
+                const selectedMesh = intersects[0].object;
+                const nodePos = selectedMesh.position;
+                targetZoom = 13;
+                targetRotation.y = Math.atan2(nodePos.x, nodePos.z);
+                targetRotation.x = Math.asin(nodePos.y / nodePos.length()) * 0.8;
+                showMemoryDetail(selectedMesh.userData);
+                playChime(440, 'sine', 0.1); 
+            } else {
+                closeDetailPanel();
+            }
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        function showMemoryDetail(data) {
+            const panel = document.getElementById('detail-panel');
+            panel.classList.remove('translate-x-full');
+            document.getElementById('detail-tag').textContent = data.stage;
+            document.getElementById('detail-text').textContent = `"${data.text}"`;
+            document.getElementById('detail-author').textContent = `— Por ${data.author || 'Anónimo'}`;
+            document.getElementById('detail-date').textContent = `Sembrado el ${data.date}`;
+            document.getElementById('detail-id').textContent = `#00${data.id}`;
+
+            const imgWrapper = document.getElementById('detail-image-wrapper');
+            if (data.isTextOnly || !data.image) imgWrapper.classList.add('hidden');
+            else { imgWrapper.classList.remove('hidden'); document.getElementById('detail-image').src = data.image; }
+        }
+
+        function closeDetailPanel() { document.getElementById('detail-panel').classList.add('translate-x-full'); }
+        function openUploadModal() {
+            const modal = document.getElementById('upload-modal');
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            modal.children[0].classList.remove('scale-95');
+            playChime(523.25, 'triangle', 0.05);
+        }
+        function closeUploadModal() {
+            const modal = document.getElementById('upload-modal');
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            modal.children[0].classList.add('scale-95');
+            resetForm();
+        }
+
+        let loadedBase64 = null;
+        function previewImage(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    loadedBase64 = e.target.result;
+                    document.getElementById('image-preview').src = loadedBase64;
+                    document.getElementById('preview-placeholder').classList.add('hidden');
+                    document.getElementById('preview-container').classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function resetForm() {
+            document.getElementById('memory-form').reset();
+            document.getElementById('preview-placeholder').classList.remove('hidden');
+            document.getElementById('preview-container').classList.add('hidden');
+            loadedBase64 = null;
+        }
+
+        function handleFormSubmit(event) {
+            event.preventDefault();
+            let stage = document.getElementById('form-stage').value;
+            const text = document.getElementById('form-text').value;
+            const author = document.getElementById('form-author').value || 'Anónimo';
+            
+            if (stage === "Asignación" || !stage) {
+                const dimensiones = ["Negación", "Ira", "Negociación", "Depresión", "Aceptación"];
+                stage = dimensiones[Math.floor(Math.random() * dimensiones.length)];
+            }
+
+            const isTextOnly = (loadedBase64 === null);
+            const image = isTextOnly ? null : loadedBase64;
+            const date = new Intl.DateTimeFormat('es-ES', { day: '2-digit', month: 'long', year: 'numeric' }).format(new Date());
+            const id = "user_" + (memories.length + 1).toString();
+
+            const newMemory = { id, stage, author, text, image, date, isTextOnly };
+            memories.unshift(newMemory);
+
+            buildMemorySpace();
+            updateTotalCount();
+            closeUploadModal();
+            showToast("Tu recuerdo se ha sembrado en el Jardín");
+
+            setTimeout(() => {
+                const targetNode = nodes.find(n => n.data.id === id);
+                if (targetNode) {
+                    const nodePos = targetNode.mesh.position;
+                    targetZoom = 13;
+                    targetRotation.y = Math.atan2(nodePos.x, nodePos.z);
+                    targetRotation.x = Math.asin(nodePos.y / nodePos.length()) * 0.8;
+                    showMemoryDetail(targetNode.mesh.userData);
+                }
+            }, 600);
+
+            playChime(523.25, 'sine', 0.2);
+        }
+
+        let isAudioOn = false, ambientOscillator = null, ambientGain = null;
+        function toggleAmbientAudio() {
+            isAudioOn = !isAudioOn;
+            const statusEl = document.getElementById('sound-status');
+            const iconEl = document.getElementById('sound-icon');
+            if (isAudioOn) {
+                statusEl.textContent = "Audio: ON"; statusEl.classList.add('text-amber-600');
+                iconEl.setAttribute('data-lucide', 'volume-2'); lucide.createIcons();
+                startAmbientPad(); showToast("Entorno sonoro activado");
+            } else {
+                statusEl.textContent = "Audio: OFF"; statusEl.classList.remove('text-amber-600');
+                iconEl.setAttribute('data-lucide', 'volume-x'); lucide.createIcons();
+                stopAmbientPad();
+            }
+        }
+
+        function playChime(frequency, type = 'sine', duration = 0.2) {
+            if (!isAudioOn) return;
+            try {
+                const context = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+                if (!audioCtx) audioCtx = context;
+                const osc = context.createOscillator();
+                const gainNode = context.createGain();
+                osc.type = type; osc.frequency.value = frequency;
+                gainNode.gain.setValueAtTime(0.12, context.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.0001, context.currentTime + duration * 6);
+                osc.connect(gainNode); gainNode.connect(context.destination);
+                osc.start(); osc.stop(context.currentTime + duration * 6);
+            } catch(e) {}
+        }
+
+        function startAmbientPad() {
+            try {
+                const context = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+                if (!audioCtx) audioCtx = context;
+                ambientOscillator = context.createOscillator();
+                ambientGain = context.createGain();
+                ambientOscillator.type = 'sine'; ambientOscillator.frequency.value = 110; 
+                ambientGain.gain.setValueAtTime(0.02, context.currentTime);
+                ambientOscillator.connect(ambientGain); ambientGain.connect(context.destination);
+                ambientOscillator.start();
+            } catch(e) {}
+        }
+        function stopAmbientPad() { if (ambientOscillator) { try { ambientOscillator.stop(); ambientOscillator.disconnect(); } catch(e) {} ambientOscillator = null; } }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-message').textContent = message;
+            toast.classList.remove('opacity-0', 'pointer-events-none');
+            setTimeout(() => { toast.classList.add('opacity-0', 'pointer-events-none'); }, 3000);
+        }
+    </script>
+</body>
+</html>
