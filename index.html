@@ -980,17 +980,17 @@
             const date = new Intl.DateTimeFormat('es-ES', { day: '2-digit', month: 'long', year: 'numeric' }).format(new Date());
 
             try {
-                // Hacemos el Insert usando "supabaseClient"
+                // Hacemos el Insert usando los nombres exactos de tus columnas en Supabase
                 const { data, error } = await supabaseClient
                     .from('recuerdos')
                     .insert([
                         {
-                            etapa: stage,
-                            autor: author,
-                            texto: text, 
-                            imagen: image, 
-                            fecha: date,
-                            is_text_only: isTextOnly
+                            stage: stage,          // Cambiado 'etapa' por 'stage'
+                            author: author,        // Cambiado 'autor' por 'author'
+                            text: text,            // Cambiado 'texto' por 'text'
+                            image: image,          // Cambiado 'imagen' por 'image'
+                            date: date,            // Se mantiene 'date'
+                            isTextOnly: isTextOnly // Cambiado 'is_text_only' por 'isTextOnly'
                         }
                     ])
                     .select();
@@ -1002,15 +1002,15 @@
 
                 const newMemory = { 
                     id: idGenerado, 
-                    stage: nuevoRegistro.etapa, 
-                    author: nuevoRegistro.autor, 
-                    text: nuevoRegistro.texto || nuevoRegistro.text || '', 
-                    image: nuevoRegistro.imagen, 
-                    date: nuevoRegistro.fecha, 
-                    isTextOnly: nuevoRegistro.is_text_only 
+                    stage: nuevoRegistro.stage, 
+                    author: nuevoRegistro.author, 
+                    text: nuevoRegistro.text, 
+                    image: nuevoRegistro.image, 
+                    date: nuevoRegistro.date, 
+                    isTextOnly: nuevoRegistro.isTextOnly 
                 };
                 
-                // Lo ponemos al principio del array activo
+                // Lo agregamos al principio de nuestra lista activa de recuerdos
                 memories.unshift(newMemory);
 
                 // Reconstruimos los nodos en 3D
