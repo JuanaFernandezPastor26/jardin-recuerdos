@@ -8,6 +8,7 @@
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <style>
         /* CARGA DIRECTA DE LAS TIPOGRAFÍAS DE OLAFUR SUBIDAS POR EL USUARIO */
@@ -262,159 +263,36 @@
     </div>
 
     <script>
-        // --- BASE DE DATOS MOCKUP ---
-        // --- BASE DE DATOS MOCKUP AMPLIADA (EL TRIPLE DE DATOS) ---
-        // Nota: Para usar tus propias imágenes, crea una carpeta llamada 'imagenes' 
-        // en el mismo directorio que este archivo HTML y guarda allí tus archivos (foto1.jpg, foto2.png, etc.)
-        const INITIAL_MEMORIES = [
-            // --- BLOQUE 1: Tus imágenes locales asociadas a la identidad del proyecto ---
-            {
-                id: "1",
-                stage: "Negación",
-                author: "Estanislao",
-                text: "Aún programo la alarma a las 07:00 am para que suene del lado derecho del colchón. Me resisto a aceptar que el silencio ahora es quien duerme allí.",
-                image: "imagenes/foto1.jpg", // <--- Apesta a tu carpeta local de imágenes
-                date: "10 de Julio, 2026",
-                isTextOnly: false
-            },
-            {
-                id: "2",
-                stage: "Ira",
-                author: "Camila R.",
-                text: "Encontré tus llaves duplicadas en el cajón del pasillo. Me dio tanta rabia que todavía conserven tu forma y tu brillo intacto mientras vos ya no estás.",
-                image: "imagenes/foto2.jpg", // <--- Segunda foto local
-                date: "12 de Julio, 2026",
-                isTextOnly: false
-            },
-            {
-                id: "3",
-                stage: "Negociación",
-                author: "Julián",
-                text: "Si guardo cada uno de tus abrigos sin lavarlos, ¿el tiempo se va a quedar congelado en el último día que los usaste?",
-                image: "imagenes/foto3.jpg", // <--- Tercera foto local
-                date: "13 de Julio, 2026",
-                isTextOnly: false
-            },
-            {
-                id: "4",
-                stage: "Depresión",
-                author: "Anónimo",
-                text: "La tarde cae gris sobre el ventanal del living. Todo el ruido de la ciudad se siente lejano, como si yo estuviera sumergido bajo diez metros de agua mansa.",
-                image: "imagenes/foto4.jpg", // <--- Cuarta foto local
-                date: "14 de Julio, 2026",
-                isTextOnly: false
-            },
-            {
-                id: "5",
-                stage: "Aceptación",
-                author: "Sofía de la Vega",
-                text: "Crucé la plaza donde solíamos sentarnos y por primera vez en meses el pecho no me dolió. Recordarte ya no se siente como una herida, sino como un refugio.",
-                image: "imagenes/foto5.jpg", // <--- Quinta foto local
-                date: "15 de Julio, 2026",
-                isTextOnly: false
-            },
+        // --- 2. CONFIGURACIÓN CLIENTE DE SUPABASE ---
+        const SUPABASE_URL = "https://uffuiovdmntavrhrfwxt.supabase.co";
+        const SUPABASE_KEY = "sb_publishable_CHON4oNPvERQdzVQwmQKeA_epjm6lXW";
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-            // --- BLOQUE 2: Recuerdos de Texto Puro (Sin imagen) ---
+        // --- RESPALDO LOCAL DE LOS RECUERDOS INICIALES ---
+        const INITIAL_MEMORIES = [
+            { id: "1", stage: "Negación", author: "Estanislao", text: "Aún programo la alarma a las 07:00 am para que suene del lado derecho del colchón. Me resisto a aceptar que el silencio ahora es quien duerme allí.", image: "imagenes/foto1.jpg", date: "10 de Julio, 2026", isTextOnly: false },
+            { id: "2", stage: "Ira", author: "Camila R.", text: "Encontré tus llaves duplicadas en el cajón del pasillo. Me dio tanta rabia que todavía conserven tu forma y tu brillo intacto mientras vos ya no estás.", image: "imagenes/foto2.jpg", date: "12 de Julio, 2026", isTextOnly: false },
+            { id: "3", stage: "Negociación", author: "Julián", text: "Si guardo cada uno de tus abrigos sin lavarlos, ¿el tiempo se va a quedar congelado en el último día que los usaste?", image: "imagenes/foto3.jpg", date: "13 de Julio, 2026", isTextOnly: false },
+            { id: "4", stage: "Depresión", author: "Anónimo", text: "La tarde cae gris sobre el ventanal del living. Todo el ruido de la ciudad se siente lejano, como si yo estuviera sumergido bajo diez metros de agua mansa.", image: "imagenes/foto4.jpg", date: "14 de Julio, 2026", isTextOnly: false },
+            { id: "5", stage: "Aceptación", author: "Sofía de la Vega", text: "Crucé la plaza donde solíamos sentarnos y por primera vez en meses el pecho no me dolió. Recordarte ya no se siente como una herida, sino como un refugio.", image: "imagenes/foto5.jpg", date: "15 de Julio, 2026", isTextOnly: false },
             { id: "6", stage: "Negación", author: "Marta", text: "El olor a café recién molido en la casa de mi abuela los domingos.", image: null, date: "12 de Julio, 2026", isTextOnly: true },
             { id: "7", stage: "Aceptación", author: "Anónimo", text: "La ruta al mar un mapa arrugado en la guantera.", image: null, date: "11 de Julio, 2026", isTextOnly: true },
             { id: "8", stage: "Ira", author: "J. M.", text: "Mi primera computadora de escritorio, el zumbido del monitor prehistórico.", image: null, date: "10 de Julio, 2026", isTextOnly: true },
             { id: "9", stage: "Depresión", author: "Lucas", text: "La taza de té dejada a la mitad en la mesita de luz.", image: null, date: "09 de Julio, 2026", isTextOnly: true },
             { id: "10", stage: "Negociación", author: "Elena", text: "Intercambiaría todos mis libros leídos por volver a escuchar tu risa apurada.", image: null, date: "08 de Julio, 2026", isTextOnly: true },
-
-            // --- BLOQUE 3: Unsplash e historias expandidas ---
-            {
-                id: "11",
-                stage: "Negación",
-                author: "Victoria",
-                text: "Busco tus ojos en las ventanillas de los trenes en hora pico. Todos los rostros borrosos tienen por un milisegundo tu misma sonrisa helada.",
-                image: "https://images.unsplash.com/photo-1517256064527-09c53b2d0bc6?q=80&w=600&auto=format&fit=crop",
-                date: "08 de Julio, 2026",
-                isTextOnly: false
-            },
-            {
-                id: "12",
-                stage: "Negación",
-                author: "Anónimo",
-                text: "La cafetera gotea exactamente dos tazas todas las mañanas. Me niego a vaciar la tuya, prefiero ver cómo se enfría hasta que el día oscurece.",
-                image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?q=80&w=600&auto=format&fit=crop",
-                date: "06 de Julio, 2026",
-                isTextOnly: false
-            },
-            {
-                id: "13",
-                stage: "Ira",
-                author: "Ramón V.",
-                text: "Le grito al mar porque sigue rompiendo en la orilla con esa rítmica calma absurda, mientras mi mundo entero se ha fracturado sin posibilidad de arreglo.",
-                image: "https://images.unsplash.com/photo-1518156677180-95a2893f3e9f?q=80&w=600&auto=format&fit=crop",
-                date: "29 de Junio, 2026",
-                isTextOnly: false
-            },
-            {
-                id: "14",
-                stage: "Ira",
-                author: "Anónimo",
-                text: "Odio las risas ajenas en el café de la esquina. ¿Cómo se atreven a seguir viviendo como si no hubiese desaparecido la única luz del día?",
-                image: "https://images.unsplash.com/photo-1478760329108-5c3ed9d495a0?q=80&w=600&auto=format&fit=crop",
-                date: "27 de Junio, 2026",
-                isTextOnly: false
-            },
-            {
-                id: "15",
-                stage: "Negociación",
-                author: "Leonel",
-                text: "Hago tratos con las estrellas apagadas: les ofrezco todos mis mañanas a cambio de que me devuelvan una sola de tus tardes de lluvia.",
-                image: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?q=80&w=600&auto=format&fit=crop",
-                date: "17 de Junio, 2026",
-                isTextOnly: false
-            },
-            {
-                id: "16",
-                stage: "Depresión",
-                author: "Lucía D.",
-                text: "Hay una niebla espesa y pálida dentro de mi pecho. No hace frío, pero mis costillas tiemblan como si estuvieran hechas de papel mojado.",
-                image: "https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?q=80&w=600&auto=format&fit=crop",
-                date: "05 de Junio, 2026",
-                isTextOnly: false
-            },
-            {
-                id: "17",
-                stage: "Aceptación",
-                author: "Gaby",
-                text: "Hoy el viento sopló y no dolió. Dejé abierta la ventana para que entre la primavera y sentí que tu recuerdo ya no me ahogaba, sino que me hacía flotar.",
-                image: "https://images.unsplash.com/photo-1426604966848-d7adac402bff?q=80&w=600&auto=format&fit=crop",
-                date: "23 de Mayo, 2026",
-                isTextOnly: false
-            },
-            {
-                id: "18",
-                stage: "Negociación",
-                author: "Marcos T.",
-                text: "Si prometo ser mejor persona de ahora en adelante, ¿existirá alguna dimensión paralela donde los minutos retrocedan antes del accidente?",
-                image: "https://images.unsplash.com/photo-1461360370896-922624d12aa1?q=80&w=600&auto=format&fit=crop",
-                date: "02 de Junio, 2026",
-                isTextOnly: false
-            },
-            {
-                id: "19",
-                stage: "Depresión",
-                author: "Clara S.",
-                text: "Todo lo que hago me cuesta el doble de energía. Despertarse es un ejercicio de resistencia contra el peso de tu ausencia.",
-                image: "https://images.unsplash.com/photo-1499209974431-9dddcece7f88?q=80&w=600&auto=format&fit=crop",
-                date: "14 de Mayo, 2026",
-                isTextOnly: false
-            },
-            {
-                id: "20",
-                stage: "Aceptación",
-                author: "Mateo",
-                text: "La vida continuó, de otra manera y con un vacío de fondo, pero continuó. Hoy volví a sonreír de verdad al mirar tu retrato en la biblioteca.",
-                image: "https://images.unsplash.com/photo-1504198453319-5ce911bafcde?q=80&w=600&auto=format&fit=crop",
-                date: "20 de Mayo, 2026",
-                isTextOnly: false
-            }
+            { id: "11", stage: "Negación", author: "Victoria", text: "Busco tus ojos en las ventanillas de los trenes en hora pico. Todos los rostros borrosos tienen por un milisegundo tu misma sonrisa helada.", image: "https://images.unsplash.com/photo-1517256064527-09c53b2d0bc6?q=80&w=600&auto=format&fit=crop", date: "08 de Julio, 2026", isTextOnly: false },
+            { id: "12", stage: "Negación", author: "Anónimo", text: "La cafetera gotea exactamente dos tazas todas las mañanas. Me niego a vaciar la tuya, prefiero ver cómo se enfría hasta que el día oscurece.", image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?q=80&w=600&auto=format&fit=crop", date: "06 de Julio, 2026", isTextOnly: false },
+            { id: "13", stage: "Ira", author: "Ramón V.", text: "Le grito al mar porque sigue rompiendo en la orilla con esa rítmica calma absurda, mientras mi mundo entero se ha fracturado sin posibilidad de arreglo.", image: "https://images.unsplash.com/photo-1518156677180-95a2893f3e9f?q=80&w=600&auto=format&fit=crop", date: "29 de Junio, 2026", isTextOnly: false },
+            { id: "14", stage: "Ira", author: "Anónimo", text: "Odio las risas ajenas en el café de la esquina. ¿Cómo se atreven a seguir viviendo como si no hubiese desaparecido la única luz del día?", image: "https://images.unsplash.com/photo-1478760329108-5c3ed9d495a0?q=80&w=600&auto=format&fit=crop", date: "27 de Junio, 2026", isTextOnly: false },
+            { id: "15", stage: "Negociación", author: "Leonel", text: "Hago tratos con las estrellas apagadas: les ofrezco todos mis mañanas a cambio de que me devuelvan una sola de tus tardes de lluvia.", image: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?q=80&w=600&auto=format&fit=crop", date: "17 de Junio, 2026", isTextOnly: false },
+            { id: "16", stage: "Depresión", author: "Lucía D.", text: "Hay una niebla espesa y pálida dentro de mi pecho. No hace frío, pero mis costillas tiemblan como si estuvieran hechas de papel mojado.", image: "https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?q=80&w=600&auto=format&fit=crop", date: "05 de Junio, 2026", isTextOnly: false },
+            { id: "17", stage: "Aceptación", author: "Gaby", text: "Hoy el viento sopló y no dolió. Dejé abierta la ventana para que entre la primavera y sentí que tu recuerdo ya no me ahogaba, sino que me hacía flotar.", image: "https://images.unsplash.com/photo-1426604966848-d7adac402bff?q=80&w=600&auto=format&fit=crop", date: "23 de Mayo, 2026", isTextOnly: false },
+            { id: "18", stage: "Negociación", author: "Marcos T.", text: "Si prometo ser mejor persona de ahora en adelante, ¿existirá alguna dimensión paralela donde los minutos retrocedan antes del accidente?", image: "https://images.unsplash.com/photo-1461360370896-922624d12aa1?q=80&w=600&auto=format&fit=crop", date: "02 de Junio, 2026", isTextOnly: false },
+            { id: "19", stage: "Depresión", author: "Clara S.", text: "Todo lo que hago me cuesta el doble de energía. Despertarse es un ejercicio de resistencia contra el peso de tu ausencia.", image: "https://images.unsplash.com/photo-1499209974431-9dddcece7f88?q=80&w=600&auto=format&fit=crop", date: "14 de Mayo, 2026", isTextOnly: false },
+            { id: "20", stage: "Aceptación", author: "Mateo", text: "La vida continuó, de otra manera y con un vacío de fondo, pero continuó. Hoy volví a sonreír de verdad al mirar tu retrato en la biblioteca.", image: "https://images.unsplash.com/photo-1504198453319-5ce911bafcde?q=80&w=600&auto=format&fit=crop", date: "20 de Mayo, 2026", isTextOnly: false }
         ];
 
-        let memories = [...INITIAL_MEMORIES];
+        let memories = [];
         let currentFilter = 'all';
 
         let scene, camera, renderer, container;
@@ -447,15 +325,60 @@
             }, 800);
         }
 
-        window.onload = function() {
+        // 5. MODIFICAR CONEXIÓN INICIAL CON EL CICLO DE VIDA DE THREE.JS
+        window.onload = async function() {
             lucide.createIcons();
+            
+            // Descargar datos desde Supabase antes de instanciar el espacio tridimensional
+            await loadMemories();
+            
             initThree();
             setupEvents();
             updateTotalCount();
             
-            // Transición automática de Pantalla 1 a Pantalla 2 tras un delay de 4 segundos
             setTimeout(nextOnboarding, 4000);
         };
+
+        // 3. FUNCIÓN PARA CARGAR RECUERDOS DESDE SUPABASE
+        async function loadMemories() {
+            try {
+                const { data, error } = await supabase
+                    .from("recuerdos")
+                    .select("*")
+                    .order("created_at", { ascending: false });
+
+                if (error) throw error;
+
+                if (data && data.length > 0) {
+                    // Mapeo adaptativo desde las columnas de Supabase hacia el modelo nativo del espacio 3D
+                    memories = data.map(item => {
+                        let formattedDate = "Reciente";
+                        if (item.created_at) {
+                            formattedDate = new Intl.DateTimeFormat('es-ES', { 
+                                day: '2-digit', 
+                                month: 'long', 
+                                year: 'numeric' 
+                            }).format(new Date(item.created_at));
+                        }
+                        return {
+                            id: item.id || item.uuid,
+                            stage: item.etapa || "Asignación",
+                            author: item.nombre || "Anónimo",
+                            text: item.recuerdo || "",
+                            image: item.imagen || null,
+                            date: formattedDate,
+                            isTextOnly: item.is_text_only !== undefined ? item.is_text_only : !item.imagen
+                        };
+                    });
+                } else {
+                    // Si la tabla está vacía de forma inicial, renderizamos el mockup extendido
+                    memories = [...INITIAL_MEMORIES];
+                }
+            } catch (err) {
+                console.warn("Error consultando Supabase, usando backup de contingencia:", err);
+                memories = [...INITIAL_MEMORIES];
+            }
+        }
 
         function updateTotalCount() {
             document.getElementById('total-count').textContent = memories.length;
@@ -681,8 +604,10 @@
                 btn.classList.add('bg-white/70', 'text-neutral-700');
             });
 
-            event.target.classList.add('active', 'bg-neutral-900', 'text-white');
-            event.target.classList.remove('bg-white/70', 'text-neutral-700');
+            if (event && event.target) {
+                event.target.classList.add('active', 'bg-neutral-900', 'text-white');
+                event.target.classList.remove('bg-white/70', 'text-neutral-700');
+            }
 
             let visibleIndex = 0;
             nodes.forEach(node => {
@@ -739,7 +664,7 @@
 
                 if (node.mesh.visible) {
                     const time = Date.now() * 0.0008;
-                    const offset = parseInt(node.mesh.userData.id) || idx * 0.3;
+                    const offset = idx * 0.3;
                     node.mesh.position.y += Math.sin(time + offset) * 0.003;
                 }
                 node.mesh.lookAt(camera.position);
@@ -875,7 +800,10 @@
             document.getElementById('detail-text').textContent = `"${data.text}"`;
             document.getElementById('detail-author').textContent = `— Por ${data.author || 'Anónimo'}`;
             document.getElementById('detail-date').textContent = `Sembrado el ${data.date}`;
-            document.getElementById('detail-id').textContent = `#00${data.id}`;
+            
+            // Tratamiento de ID amigable ya sea numérico secuencial o UUID de base de datos
+            const displayId = String(data.id).includes("-") ? String(data.id).substring(0, 5).toUpperCase() : data.id;
+            document.getElementById('detail-id').textContent = `#${displayId}`;
 
             const imgWrapper = document.getElementById('detail-image-wrapper');
             if (data.isTextOnly || !data.image) imgWrapper.classList.add('hidden');
@@ -918,8 +846,14 @@
             loadedBase64 = null;
         }
 
-        function handleFormSubmit(event) {
+        // 4. MODIFICAR SUBMIT DEL FORMULARIO PARA GUARDADO PERSISTENTE EN SUPABASE
+        async function handleFormSubmit(event) {
             event.preventDefault();
+            
+            const submitBtn = document.getElementById('submit-memory-btn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = "Sembrando...";
+
             let stage = document.getElementById('form-stage').value;
             const text = document.getElementById('form-text').value;
             const author = document.getElementById('form-author').value || 'Anónimo';
@@ -931,29 +865,57 @@
 
             const isTextOnly = (loadedBase64 === null);
             const image = isTextOnly ? null : loadedBase64;
-            const date = new Intl.DateTimeFormat('es-ES', { day: '2-digit', month: 'long', year: 'numeric' }).format(new Date());
-            const id = "user_" + (memories.length + 1).toString();
 
-            const newMemory = { id, stage, author, text, image, date, isTextOnly };
-            memories.unshift(newMemory);
+            try {
+                // Inserción directa en la base de datos de Supabase
+                const { data, error } = await supabase
+                    .from("recuerdos")
+                    .insert([
+                        {
+                            nombre: author,
+                            recuerdo: text,
+                            etapa: stage,
+                            imagen: image,
+                            is_text_only: isTextOnly
+                        }
+                    ])
+                    .select();
 
-            buildMemorySpace();
-            updateTotalCount();
-            closeUploadModal();
-            showToast("Tu recuerdo se ha sembrado en el Jardín");
+                if (error) throw error;
 
-            setTimeout(() => {
-                const targetNode = nodes.find(n => n.data.id === id);
-                if (targetNode) {
-                    const nodePos = targetNode.mesh.position;
-                    targetZoom = 13;
-                    targetRotation.y = Math.atan2(nodePos.x, nodePos.z);
-                    targetRotation.x = Math.asin(nodePos.y / nodePos.length()) * 0.8;
-                    showMemoryDetail(targetNode.mesh.userData);
+                // Re-descargar base de datos actualizada
+                await loadMemories();
+                
+                // Reconstruir espacio geométrico y refrescar contadores UI
+                buildMemorySpace();
+                updateTotalCount();
+                closeUploadModal();
+                showToast("Tu recuerdo se ha sembrado en el Jardín");
+
+                // Auto-enfoque de cámara sobre el elemento recién sembrado en la nube 3D
+                if (data && data[0]) {
+                    const insertedId = data[0].id || data[0].uuid;
+                    setTimeout(() => {
+                        const targetNode = nodes.find(n => n.data.id === insertedId);
+                        if (targetNode) {
+                            const nodePos = targetNode.mesh.position;
+                            targetZoom = 13;
+                            targetRotation.y = Math.atan2(nodePos.x, nodePos.z);
+                            targetRotation.x = Math.asin(nodePos.y / nodePos.length()) * 0.8;
+                            showMemoryDetail(targetNode.mesh.userData);
+                        }
+                    }, 600);
                 }
-            }, 600);
 
-            playChime(523.25, 'sine', 0.2);
+                playChime(523.25, 'sine', 0.2);
+
+            } catch (err) {
+                console.error("Error guardando el recuerdo:", err);
+                showToast("Error de conexión al sembrar el recuerdo");
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = "Sembrar en el Jardín";
+            }
         }
 
         let isAudioOn = false, ambientOscillator = null, ambientGain = null;
