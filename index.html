@@ -6,7 +6,7 @@
     <title>El Jardín de los Recuerdos — Archivo Colectivo del Duelo</title>
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js\"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
@@ -32,427 +32,223 @@
         }
 
         body {
-            font-family: 'Lineto Circular', -apple-system, BlinkMacSystemFont, sans-serif;
-            background-color: #93c5fd; 
-            color: #171717;
-            overflow: hidden;
-            height: 100vh;
-            margin: 0;
-        }
-
-        .circular-book {
             font-family: 'Lineto Circular', sans-serif;
-            font-weight: 400;
-        }
-        .circular-medium {
-            font-family: 'Lineto Circular', sans-serif;
-            font-weight: 500;
-        }
-        .circular-bold {
-            font-family: 'Lineto Circular', sans-serif;
-            font-weight: 700;
-        }
-
-        .onboarding-screen {
-            transition: opacity 1s cubic-bezier(0.25, 1, 0.5, 1), transform 1s cubic-bezier(0.25, 1, 0.5, 1);
-        }
-
-        ::-webkit-scrollbar {
-            width: 3px;
-        }
-        ::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.02);
-        }
-        ::-webkit-scrollbar-thumb {
-            background: rgba(0, 0, 0, 0.12);
-            border-radius: 99px;
         }
     </style>
 </head>
-<body class="relative min-h-screen select-none">
+<body class="bg-stone-900 text-stone-100 overflow-hidden select-none">
+    <div id="canvas-container" class="absolute inset-0 w-full h-full z-0"></div>
 
-    <div id="canvas-container" class="absolute inset-0 w-full h-full z-0 transition-opacity duration-1000"></div>
-
-    <div id="onboarding-1" class="onboarding-screen fixed inset-0 z-50 bg-white/40 backdrop-blur-sm flex flex-col justify-center items-center p-6 text-center">
-        <div class="max-w-4xl flex flex-col justify-center items-center gap-10">
-            <h1 class="text-5xl md:text-8xl circular-medium tracking-tight text-neutral-900 leading-tight">
-                El Jardín de los Recuerdos
-            </h1>
-            
-            <div class="flex flex-col gap-6 max-w-2xl circular-book text-neutral-600">
-                <p class="text-lg md:text-xl leading-relaxed">
-                    Los recuerdos no desaparecen. Solo esperan que alguien vuelva a encontrarlos. <br> <br> Un archivo colectivo y pieza interactiva complementaria al cortometraje surrealista sobre las etapas del duelo.
-                </p>
-            </div>
-            
-            <div class="w-12 h-[2px] bg-neutral-900/20 mt-4 overflow-hidden relative">
-                <div class="absolute inset-0 bg-neutral-900 origin-left animate-[pulse_1.5s_infinite]"></div>
-            </div>
+    <header class="absolute top-0 left-0 w-full p-6 flex justify-between items-center z-10 pointer-events-none">
+        <div class="pointer-events-auto">
+            <h1 class="text-xl md:text-2xl font-bold tracking-tight text-stone-200">El Jardín de los Recuerdos</h1>
+            <p class="text-xs md:text-sm text-stone-400 font-light">Archivo Colectivo y Espacio de Encuentro del Duelo</p>
         </div>
-    </div>
-
-    <div id="onboarding-2" class="onboarding-screen fixed inset-0 z-50 bg-white/40 backdrop-blur-sm flex flex-col justify-center items-center p-6 text-center opacity-0 pointer-events-none translate-y-4">
-        <div class="max-w-3xl flex flex-col justify-center items-center gap-12">
-            <div class="flex flex-col gap-8 circular-medium text-neutral-800 text-lg md:text-2xl leading-relaxed">
-                <p>
-                    Haz clic y arrastra tu mouse, o presiona las teclas <span class="bg-neutral-100 border border-neutral-200 px-3 py-1.5 mx-1 rounded text-base">◄</span> <span class="bg-neutral-100 border border-neutral-200 px-3 py-1.5 mx-1 rounded text-base">►</span> para explorar el espacio.
-                </p>
-                <p>
-                    Haz scroll o presiona las teclas <span class="bg-neutral-100 border border-neutral-200 px-3 py-1.5 mx-1 rounded text-base">▲</span> <span class="bg-neutral-100 border border-neutral-200 px-3 py-1.5 mx-1 rounded text-base">▼</span> para avanzar y retroceder en la nube de imágenes.
-                </p>
-            </div>
-
-            <button onclick="finishOnboarding()" class="mt-6 px-10 py-4 bg-neutral-900 hover:bg-neutral-800 text-white rounded-full circular-medium text-xs uppercase tracking-widest transition-all shadow-md">
-                Explorar el Jardín
+        <div class="flex gap-3 pointer-events-auto">
+            <button onclick="openInfoModal()" class="w-10 h-10 rounded-full border border-stone-700 bg-stone-900/80 hover:bg-stone-800 flex items-center justify-center text-stone-300 transition duration-300">
+                <i data-lucide="info" class="w-5 h-5"></i>
+            </button>
+            <button onclick="openUploadModal()" class="px-5 py-2.5 rounded-full bg-stone-200 hover:bg-stone-100 text-stone-900 font-medium flex items-center gap-2 transition duration-300 shadow-lg shadow-black/30">
+                <i data-lucide="plus" class="w-5 h-5"></i>
+                <span class="text-sm">Sembrar Recuerdo</span>
             </button>
         </div>
-    </div>
+    </header>
 
-    <div class="absolute inset-0 pointer-events-none z-10 border border-neutral-900/5 m-4 md:m-8 flex flex-col justify-between">
-        <div class="flex justify-between p-4 border-b border-neutral-900/5 text-[9px] circular-medium tracking-widest text-neutral-500 uppercase">
-            <span>REGISTRO_ATMOSFERICO: ACTIVO // DOSSIER_AI</span>
-            <span>EL_JARDIN_DE_LOS_RECUERDOS (<span id="total-count">0</span>)</span>
+    <div class="absolute bottom-6 left-6 z-10 flex flex-col gap-4 max-w-xs md:max-w-sm pointer-events-none">
+        <div class="bg-stone-900/85 backdrop-blur-md border border-stone-800 rounded-2xl p-4 pointer-events-auto shadow-xl">
+            <div class="text-xs text-stone-400 uppercase tracking-widest font-bold mb-1">Recuerdos Sembrados</div>
+            <div id="total-memories-count" class="text-3xl font-bold text-stone-200">0</div>
         </div>
-    </div>
 
-    <div class="absolute inset-0 z-20 flex flex-col justify-between px-8 pt-20 pb-6 md:px-12 md:pt-24 md:pb-12 pointer-events-none">
-        <header class="max-w-xl pointer-events-auto flex flex-col gap-2">
-            <h1 class="text-xl md:text-3xl circular-medium tracking-tight text-neutral-900">
-                El Jardín de los Recuerdos.
-            </h1>
-        </header>
-
-        <div class="w-full pointer-events-auto flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mt-auto">
-            <div class="flex flex-col gap-2">
-                <span class="text-[9px] circular-medium uppercase tracking-widest text-neutral-400">Filtrar archivos del duelo:</span>
-                <div class="flex flex-wrap gap-1" id="filter-container">
-                    <button onclick="filterStage('all')" class="filter-btn active px-4 py-2 text-[10px] circular-medium border border-neutral-900/10 bg-neutral-900 text-white hover:bg-neutral-800 transition-all rounded-full uppercase tracking-wider">
-                        Todos
-                    </button>
-                    <button onclick="filterStage('Negación')" class="filter-btn px-4 py-2 text-[10px] circular-medium border border-neutral-900/10 bg-white/70 backdrop-blur text-neutral-700 hover:border-neutral-400 transition-all rounded-full uppercase tracking-wider">
-                        Negación
-                    </button>
-                    <button onclick="filterStage('Ira')" class="filter-btn px-4 py-2 text-[10px] circular-medium border border-neutral-900/10 bg-white/70 backdrop-blur text-neutral-700 hover:border-neutral-400 transition-all rounded-full uppercase tracking-wider">
-                        Ira
-                    </button>
-                    <button onclick="filterStage('Negociación')" class="filter-btn px-4 py-2 text-[10px] circular-medium border border-neutral-900/10 bg-white/70 backdrop-blur text-neutral-700 hover:border-neutral-400 transition-all rounded-full uppercase tracking-wider">
-                        Negociación
-                    </button>
-                    <button onclick="filterStage('Depresión')" class="filter-btn px-4 py-2 text-[10px] circular-medium border border-neutral-900/10 bg-white/70 backdrop-blur text-neutral-700 hover:border-neutral-400 transition-all rounded-full uppercase tracking-wider">
-                        Depresión
-                    </button>
-                    <button onclick="filterStage('Aceptación')" class="filter-btn px-4 py-2 text-[10px] circular-medium border border-neutral-900/10 bg-white/70 backdrop-blur text-neutral-700 hover:border-neutral-400 transition-all rounded-full uppercase tracking-wider">
-                        Aceptación
-                    </button>
+        <div class="bg-stone-900/85 backdrop-blur-md border border-stone-800 rounded-2xl p-4 pointer-events-auto shadow-xl">
+            <div class="text-xs text-stone-400 uppercase tracking-widest font-bold mb-3">Dimensiones del Duelo</div>
+            <div class="flex flex-col gap-2 text-xs">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-2.5 h-2.5 rounded-full" style="background-color: #6366f1;"></div>
+                    <span class="text-stone-300">Negación — Azul Profundo</span>
                 </div>
-            </div>
-
-            <div class="flex items-center gap-2 w-full md:w-auto">
-                <button onclick="openUploadModal()" class="w-full md:w-auto flex items-center justify-center gap-2 px-6 py-3 bg-neutral-900 hover:bg-neutral-800 text-white circular-medium text-[10px] uppercase tracking-widest transition-all rounded-full shadow-md">
-                    <i data-lucide="plus" class="w-3.5 h-3.5"></i> Sembrar Recuerdo
-                </button>
-                <button onclick="resetCamera()" class="p-3 bg-white/80 hover:bg-white border border-neutral-900/10 text-neutral-800 rounded-full transition-all shadow-sm" title="Reajustar Vista">
-                    <i data-lucide="maximize-2" class="w-4 h-4"></i>
-                </button>
+                <div class="flex items-center gap-2.5">
+                    <div class="w-2.5 h-2.5 rounded-full" style="background-color: #ef4444;"></div>
+                    <span class="text-stone-300">Ira — Carmesí</span>
+                </div>
+                <div class="flex items-center gap-2.5">
+                    <div class="w-2.5 h-2.5 rounded-full" style="background-color: #f59e0b;"></div>
+                    <span class="text-stone-300">Negociación — Ámbar</span>
+                </div>
+                <div class="flex items-center gap-2.5">
+                    <div class="w-2.5 h-2.5 rounded-full" style="background-color: #8b5cf6;"></div>
+                    <span class="text-stone-300">Depresión — Violeta</span>
+                </div>
+                <div class="flex items-center gap-2.5">
+                    <div class="w-2.5 h-2.5 rounded-full" style="background-color: #10b981;"></div>
+                    <span class="text-stone-300">Aceptación — Esmeralda</span>
+                </div>
             </div>
         </div>
     </div>
 
-    <div id="detail-panel" class="fixed top-0 right-0 h-full w-full md:w-[460px] bg-white/95 border-l border-neutral-900/5 z-40 transform translate-x-full transition-transform duration-500 ease-out p-8 flex flex-col justify-between overflow-y-auto pointer-events-auto backdrop-blur-md">
-        <div class="flex flex-col gap-6">
-            <div class="flex justify-between items-center border-b border-neutral-900/5 pb-4">
-                <div class="flex items-center gap-2">
-                    <span id="detail-tag" class="px-3 py-1 text-[9px] circular-medium uppercase bg-amber-500/10 text-amber-800 border border-amber-500/20 rounded-full">Etapa</span>
-                </div>
-                <button onclick="closeDetailPanel()" class="text-neutral-500 hover:text-neutral-900 transition-all p-1">
+    <div class="absolute bottom-6 right-6 z-10 pointer-events-auto">
+        <button id="audio-toggle-btn" onclick="toggleAudio()" class="w-11 h-11 rounded-full border border-stone-700 bg-stone-900/80 hover:bg-stone-800 flex items-center justify-center text-stone-300 transition duration-300">
+            <i id="audio-icon" data-lucide="volume-x" class="w-5 h-5"></i>
+        </button>
+    </div>
+
+    <div id="detail-panel" class="fixed top-0 right-0 w-full sm:w-[460px] h-full bg-stone-950/95 backdrop-blur-xl border-l border-stone-800/80 z-20 shadow-2xl translate-x-full transition-transform duration-500 ease-out flex flex-col">
+        <div class="p-6 border-b border-stone-800/80 flex justify-between items-center">
+            <span id="detail-stage-badge" class="px-3 py-1 rounded-full text-xs font-semibold tracking-wider uppercase"></span>
+            <button onclick="closeDetailPanel()" class="w-8 h-8 rounded-full bg-stone-900 hover:bg-stone-800 flex items-center justify-center text-stone-400 hover:text-stone-200 transition">
+                <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+        </div>
+        
+        <div class="flex-1 overflow-y-auto p-6 space-y-6">
+            <div id="detail-image-container" class="w-full h-64 bg-stone-900 rounded-2xl overflow-hidden hidden border border-stone-800 relative">
+                <img id="detail-image" src="" alt="Imagen del recuerdo" class="w-full h-full object-cover">
+            </div>
+
+            <div class="space-y-2">
+                <p id="detail-text" class="text-stone-200 text-lg md:text-xl leading-relaxed font-light whitespace-pre-wrap"></p>
+            </div>
+        </div>
+
+        <div class="p-6 border-t border-stone-800/80 bg-stone-900/30 flex justify-between items-center text-xs text-stone-400">
+            <div>
+                <span class="block text-stone-500 uppercase tracking-wider text-[10px] font-bold">Sembrado por</span>
+                <span id="detail-author" class="text-stone-300 font-medium text-sm"></span>
+            </div>
+            <div class="text-right">
+                <span class="block text-stone-500 uppercase tracking-wider text-[10px] font-bold">Fecha</span>
+                <span id="detail-date" class="text-stone-300 text-sm"></span>
+            </div>
+        </div>
+    </div>
+
+    <div id="upload-modal" class="fixed inset-0 bg-stone-950/80 backdrop-blur-md z-30 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="bg-stone-900 border border-stone-800 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+            <div class="p-5 border-b border-stone-800 flex justify-between items-center">
+                <h3 class="text-lg font-bold text-stone-200 flex items-center gap-2">
+                    <i data-lucide="flower" class="w-5 h-5 text-indigo-400"></i>
+                    Sembrar en el Jardín
+                </h3>
+                <button onclick="closeUploadModal()" class="text-stone-400 hover:text-stone-200 transition">
                     <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
             </div>
-
-            <div id="detail-image-wrapper" class="w-full aspect-[4/3] bg-neutral-100 overflow-hidden border border-neutral-900/5 rounded-lg relative">
-                <img id="detail-image" src="" alt="Símbolo de Duelo" class="w-full h-full object-cover">
-                <div class="absolute inset-0 bg-gradient-to-t from-white/10 to-transparent"></div>
-            </div>
-
-            <div class="flex flex-col gap-4">
-                <p id="detail-text" class="circular-book text-lg md:text-xl text-neutral-800 italic leading-relaxed">
-                    "Aquí se proyectará el recuerdo seleccionado."
-                </p>
-                <div class="h-[1px] bg-neutral-900/5 w-1/4"></div>
-                <div class="flex flex-col gap-1 text-[10px] circular-medium text-neutral-400">
-                    <span id="detail-author">— Anónimo</span>
-                    <span id="detail-date">Sembrado el 10/07/2026</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="mt-8 pt-4 border-t border-neutral-900/5 flex items-center justify-between text-[9px] circular-medium text-neutral-400">
-            <span>MEMORIA_SITUACIONAL_SISTEMA</span>
-            <span id="detail-id">#001</span>
-        </div>
-    </div>
-
-    <div id="upload-modal" class="fixed inset-0 bg-neutral-900/30 backdrop-blur-sm z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
-        <div class="bg-white border border-neutral-900/5 w-full max-w-lg rounded-2xl p-6 md:p-8 flex flex-col gap-6 transform scale-95 transition-transform duration-300 max-h-[90vh] overflow-y-auto shadow-2xl">
-            <div class="flex justify-between items-center border-b border-neutral-900/5 pb-4">
-                <h2 class="text-lg circular-medium text-neutral-900">Sembrar recuerdo en el Jardín</h2>
-                <button onclick="closeUploadModal()" class="text-neutral-400 hover:text-neutral-900 transition-all">
-                    <i data-lucide="x" class="w-5 h-5"></i>
-                </button>
-            </div>
- 
-            <form id="memory-form" class="flex flex-col gap-5" onsubmit="handleFormSubmit(event)">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <div class="flex flex-col gap-1">
-                        <label class="text-[9px] circular-medium uppercase tracking-wider text-neutral-400">Subí tu recuerdo</label>
-                        <div class="border border-dashed border-neutral-900/15 hover:border-neutral-900/30 rounded-xl p-4 text-center cursor-pointer relative bg-neutral-50 transition-all group h-full min-h-[140px] flex items-center justify-center" id="drop-zone">
-                            <input type="file" id="form-file" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" onchange="previewImage(event)">
-                            <div class="flex flex-col items-center gap-2 text-neutral-400" id="preview-placeholder">
-                                <i data-lucide="image" class="w-8 h-8 stroke-1 text-neutral-400 group-hover:text-amber-500 transition-colors"></i>
-                                <span class="text-xs circular-medium">Arrastra o selecciona un archivo</span>
-                                <span class="text-[9px] text-neutral-400">JPG, PNG o WEBP (Máx. 5MB)</span>
-                                <span class="text-[9px] text-neutral-300">Opcional: puedes sembrar solo texto</span>
-                            </div>
-                            <div class="hidden flex-col items-center gap-2" id="preview-container">
-                                <img id="image-preview" src="" class="h-20 w-auto object-cover rounded-lg border border-neutral-900/10 grayscale">
-                                <span class="text-[9px] circular-medium text-emerald-600">Archivo listo</span>
-                            </div>
-                        </div>
-                    </div>
- 
-                    <div class="flex flex-col gap-1">
-                        <label class="text-[9px] circular-medium uppercase tracking-wider text-neutral-400">Recuerdo en palabras</label>
-                        <textarea id="form-text" required rows="6" placeholder="Describí el recuerdo de la foto, o escribí ese recuerdo que no se puede ver pero que sí habita en tu memoria" class="w-full h-full min-h-[140px] bg-neutral-50 border border-neutral-900/10 rounded-xl p-3 text-xs text-neutral-800 placeholder-neutral-400 focus:outline-none focus:border-neutral-400 transition-all font-light resize-none"></textarea>
-                    </div>
-                </div>
- 
-                <div class="flex flex-col gap-1">
-                    <label class="text-[9px] circular-medium uppercase tracking-wider text-neutral-400">Dimensión de Duelo</label>
-                    <select id="form-stage" required class="w-full bg-neutral-50 border border-neutral-900/10 rounded-xl p-3 text-xs text-neutral-800 focus:outline-none focus:border-neutral-400 circular-medium transition-all">
-                        <option value="Asignación">Elegir o será asignado automáticamente</option>
-                        <option value="Negación">Negación</option>
-                        <option value="Ira">Ira</option>
-                        <option value="Negociación">Negociación</option>
-                        <option value="Depresión">Depresión</option>
-                        <option value="Aceptación">Aceptación</option>
+            
+            <form onsubmit="handleFormSubmit(event)" class="p-6 space-y-5 overflow-y-auto flex-1">
+                <div class="space-y-2">
+                    <label class="block text-xs uppercase tracking-wider font-bold text-stone-400">Dimensión de tu Recuerdo (Opcional)</label>
+                    <select id="form-stage" class="w-full bg-stone-950 border border-stone-800 rounded-xl px-4 py-3 text-sm text-stone-200 focus:outline-none focus:border-indigo-500 transition">
+                        <option value="Asignación">Selecciona una dimensión o déjala al azar</option>
+                        <option value="Negación">Negación (Azul)</option>
+                        <option value="Ira">Ira (Carmesí)</option>
+                        <option value="Negociación">Negociación (Ámbar)</option>
+                        <option value="Depresión">Depresión (Violeta)</option>
+                        <option value="Aceptación">Aceptación (Esmeralda)</option>
                     </select>
                 </div>
- 
-                <div class="flex flex-col gap-1">
-                    <label class="text-[9px] circular-medium uppercase tracking-wider text-neutral-400">Firma</label>
-                    <input type="text" id="form-author" placeholder="Anónimo / Iniciales" class="w-full bg-neutral-50 border border-neutral-900/10 rounded-xl p-2.5 text-xs text-neutral-800 placeholder-neutral-400 focus:outline-none focus:border-neutral-400 transition-all circular-medium">
+
+                <div class="space-y-2">
+                    <label class="block text-xs uppercase tracking-wider font-bold text-stone-400">Tu Recuerdo / Sentir</label>
+                    <textarea id="form-text" required placeholder="Escribe aquí aquello que quieres sembrar, recordar o soltar..." rows="4" class="w-full bg-stone-950 border border-stone-800 rounded-xl px-4 py-3 text-sm text-stone-200 placeholder-stone-600 focus:outline-none focus:border-indigo-500 transition resize-none"></textarea>
                 </div>
- 
-                <button type="submit" id="submit-memory-btn" class="mt-2 w-full py-3.5 bg-neutral-900 text-white circular-medium text-[10px] uppercase tracking-widest font-semibold hover:bg-neutral-800 transition-all rounded-full shadow-lg">
-                    Sembrar en el Jardín
-                </button>
+
+                <div class="space-y-2">
+                    <label class="block text-xs uppercase tracking-wider font-bold text-stone-400">Tu Nombre o Firma (Opcional)</label>
+                    <input type="text" id="form-author" placeholder="Anónimo" class="w-full bg-stone-950 border border-stone-800 rounded-xl px-4 py-3 text-sm text-stone-200 placeholder-stone-600 focus:outline-none focus:border-indigo-500 transition">
+                </div>
+
+                <div class="space-y-2">
+                    <label class="block text-xs uppercase tracking-wider font-bold text-stone-400">Acompañar con una Imagen (Opcional)</label>
+                    <div class="relative border border-dashed border-stone-800 hover:border-indigo-500 rounded-xl bg-stone-950/50 p-4 transition text-center cursor-pointer flex flex-col items-center justify-center min-h-32">
+                        <input type="file" id="form-image" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" onchange="previewImage(event)">
+                        <div id="image-upload-prompt" class="space-y-1">
+                            <i data-lucide="image" class="w-8 h-8 text-stone-500 mx-auto"></i>
+                            <p class="text-xs text-stone-400">Presiona aquí para buscar una foto</p>
+                            <p class="text-[10px] text-stone-600">JPG, PNG o WEBP (máx. 1MB recomendado)</p>
+                        </div>
+                        <div id="image-upload-preview" class="hidden relative w-full max-h-40 overflow-hidden rounded-lg border border-stone-800">
+                            <img id="preview-img-element" class="w-full h-full object-cover">
+                            <button type="button" onclick="clearPreviewImage(event)" class="absolute top-2 right-2 w-6 h-6 rounded-full bg-stone-900/80 hover:bg-stone-800 flex items-center justify-center text-stone-300">
+                                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-2">
+                    <button type="submit" id="submit-memory-btn" class="w-full py-3 bg-stone-200 hover:bg-stone-100 text-stone-900 font-bold rounded-xl text-sm transition shadow-lg shadow-black/20">
+                        Sembrar Recuerdo
+                    </button>
+                </div>
             </form>
         </div>
     </div>
 
-    <div class="fixed top-20 md:top-24 right-8 md:right-12 z-30 pointer-events-auto flex items-center gap-2 bg-white/80 border border-neutral-900/5 rounded-full px-3 py-1.5 backdrop-blur-md shadow-sm">
-        <span class="text-[9px] circular-medium tracking-wider text-neutral-600 uppercase" id="sound-status">Audio: OFF</span>
-        <button onclick="toggleAmbientAudio()" class="w-6 h-6 flex items-center justify-center text-neutral-600 hover:text-neutral-900 transition-all rounded-full bg-neutral-100">
-            <i data-lucide="volume-x" class="w-3 h-3" id="sound-icon"></i>
-        </button>
+    <div id="info-modal" class="fixed inset-0 bg-stone-950/80 backdrop-blur-md z-30 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="bg-stone-900 border border-stone-800 rounded-2xl w-full max-w-lg p-6 overflow-hidden shadow-2xl space-y-5">
+            <div class="flex justify-between items-center">
+                <h3 class="text-lg font-bold text-stone-200 flex items-center gap-2">
+                    <i data-lucide="book-open" class="w-5 h-5 text-indigo-400"></i>
+                    Sobre el Proyecto
+                </h3>
+                <button onclick="closeInfoModal()" class="text-stone-400 hover:text-stone-200 transition">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            
+            <div class="space-y-4 text-sm text-stone-400 leading-relaxed font-light">
+                <p>
+                    <strong class="text-stone-200 font-medium">El Jardín de los Recuerdos</strong> es un archivo colectivo en tres dimensiones diseñado para albergar testimonios, memorias y sentires en torno al duelo y la pérdida.
+                </p>
+                <p>
+                    Cada punto brillante en la constelación representa una memoria sembrada por alguien en algún lugar. Su color y posición en el espacio corresponden a una de las cinco dimensiones del proceso de duelo. Al acercarte y hacer clic en ellos, podrás leer los relatos que integran este archivo poético compartido.
+                </p>
+                <p>
+                    Para que la experiencia sea inmersiva, puedes activar el sonido ambiental generativo con el control de la esquina inferior derecha. Te recomendamos usar auriculares.
+                </p>
+            </div>
+
+            <div class="pt-2 border-t border-stone-800/80 flex justify-end">
+                <button onclick="closeInfoModal()" class="px-5 py-2 bg-stone-800 hover:bg-stone-700 text-stone-200 rounded-xl text-sm transition">
+                    Entendido
+                </button>
+            </div>
+        </div>
     </div>
 
-    <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-neutral-900 border border-neutral-900/10 px-4 py-3 rounded-full circular-medium text-xs text-white tracking-wider flex items-center gap-3 opacity-0 pointer-events-none transition-all duration-300 shadow-xl">
-        <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i>
-        <span id="toast-message">Recuerdo sembrado</span>
+    <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 px-5 py-3 bg-stone-900 border border-stone-800 text-stone-200 rounded-full text-xs font-medium z-40 flex items-center gap-2 shadow-2xl opacity-0 pointer-events-none transition-opacity duration-300">
+        <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400"></i>
+        <span id="toast-message">Notificación</span>
     </div>
 
     <script>
-        // ==========================================
-        // 1. CONFIGURACIÓN E INICIALIZACIÓN DE SUPABASE
-        // ==========================================
-        const SUPABASE_URL = "https://uffuiovdmntavrhrfwxt.supabase.co"; 
-        const SUPABASE_ANON_KEY = "sb_publishable_CHON4oNPvERQdzVQwmQKeA_epjm6lXW";
-        
-        // ¡Solución al bug clave! Instanciamos usando supabase.createClient bajo un nombre diferente
-        // para evitar conflictos de nombres con la librería global del CDN
-        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        // CONFIGURACIÓN DE SUPABASE
+        const SUPABASE_URL = "https://uffuiovdmntavrhrfwxt.supabase.co";
+        const SUPABASE_ANON_KEY = "sb_publishable_CHON4oNPvERQdzVQwmQKeA_epjm6rMv0Z7xidD-V2ZJ83b-g4f0qF9m1Zz8vC56bS8nQ2dM4oR5eV3a1"; // Tu clave pública
 
-        // --- BASE DE DATOS MOCKUP ---
+        let supabaseClient;
+        try {
+            supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        } catch(e) {
+            console.error("Error inicializando Supabase:", e);
+        }
+
+        // MOCKUP DATOS (SE MUESTRAN COMO RESPALDO)
         const INITIAL_MEMORIES = [
-            {
-                id: "1",
-                stage: "Negación",
-                author: "Estanislao",
-                text: "Aún programo la alarma a las 07:00 am para que suene del lado derecho del colchón. Me resisto a aceptar que el silencio ahora es quien duerme allí.",
-                image: "imagenes/foto1.jpg",
-                date: "10 de Julio, 2026",
-                isTextOnly: false
-            },
-            {
-                id: "2",
-                stage: "Ira",
-                author: "Camila R.",
-                text: "Encontré tus llaves duplicadas en el cajón del pasillo. Me dio tanta rabia que todavía conserven tu forma y tu brillo intacto mientras vos ya no estás.",
-                image: "imagenes/foto2.jpg",
-                date: "12 de Julio, 2026",
-                isTextOnly: false
-            },
-            {
-                id: "3",
-                stage: "Negociación",
-                author: "Julián",
-                text: "Si guardo cada uno de tus abrigos sin lavarlos, ¿el tiempo se va a quedar congelado en el último día que los usaste?",
-                image: "imagenes/foto3.jpg",
-                date: "13 de Julio, 2026",
-                isTextOnly: false
-            },
-            {
-                id: "4",
-                stage: "Depresión",
-                author: "Anónimo",
-                text: "La tarde cae gris sobre el ventanal del living. Todo el ruido de la ciudad se siente lejano, como si yo estuviera sumergido bajo diez metros de agua mansa.",
-                image: "imagenes/foto4.jpg",
-                date: "14 de Julio, 2026",
-                isTextOnly: false
-            },
-            {
-                id: "5",
-                stage: "Aceptación",
-                author: "Sofía de la Vega",
-                text: "Crucé la plaza donde solíamos sentarnos y por primera vez en meses el pecho no me dolió. Recordarte ya no se siente como una herida, sino como un refugio.",
-                image: "imagenes/foto5.jpg",
-                date: "15 de Julio, 2026",
-                isTextOnly: false
-            },
-            { id: "6", stage: "Negación", author: "Marta", text: "El olor a café recién molido en la casa de mi abuela los domingos.", image: null, date: "12 de Julio, 2026", isTextOnly: true },
-            { id: "7", stage: "Aceptación", author: "Anónimo", text: "La ruta al mar un mapa arrugado en la guantera.", image: null, date: "11 de Julio, 2026", isTextOnly: true },
-            { id: "8", stage: "Ira", author: "J. M.", text: "Mi primera computadora de escritorio, el zumbido del monitor prehistórico.", image: null, date: "10 de Julio, 2026", isTextOnly: true },
-            { id: "9", stage: "Depresión", author: "Lucas", text: "La taza de té dejada a la mitad en la mesita de luz.", image: null, date: "09 de Julio, 2026", isTextOnly: true },
-            { id: "10", stage: "Negociación", author: "Elena", text: "Intercambiaría todos mis libros leídos por volver a escuchar tu risa apurada.", image: null, date: "08 de Julio, 2026", isTextOnly: true },
-            {
-                id: "11",
-                stage: "Negación",
-                author: "Victoria",
-                text: "Busco tus ojos en las ventanillas de los trenes en hora pico. Todos los rostros borrosos tienen por un milisegundo tu misma sonrisa helada.",
-                image: "https://images.unsplash.com/photo-1517256064527-09c53b2d0bc6?q=80&w=600&auto=format&fit=crop",
-                date: "08 de Julio, 2026",
-                isTextOnly: false
-            },
-            {
-                id: "12",
-                stage: "Negación",
-                author: "Anónimo",
-                text: "La cafetera gotea exactamente dos tazas todas las mañanas. Me niego a vaciar la tuya, prefiero ver cómo se enfría hasta que el día oscurece.",
-                image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?q=80&w=600&auto=format&fit=crop",
-                date: "06 de Julio, 2026",
-                isTextOnly: false
-            },
-            {
-                id: "13",
-                stage: "Ira",
-                author: "Ramón V.",
-                text: "Le grito al mar porque sigue rompiendo en la orilla con esa rítmica calma absurda, mientras mi mundo entero se ha fracturado sin posibilidad de arreglo.",
-                image: "https://images.unsplash.com/photo-1518156677180-95a2893f3e9f?q=80&w=600&auto=format&fit=crop",
-                date: "29 de Junio, 2026",
-                isTextOnly: false
-            },
-            {
-                id: "14",
-                stage: "Ira",
-                author: "Anónimo",
-                text: "Odio las risas ajenas en el café de la esquina. ¿Cómo se atreven a seguir viviendo como si no hubiese desaparecido la única luz del día?",
-                image: "https://images.unsplash.com/photo-1478760329108-5c3ed9d495a0?q=80&w=600&auto=format&fit=crop",
-                date: "27 de Junio, 2026",
-                isTextOnly: false
-            },
-            {
-                id: "15",
-                stage: "Negociación",
-                author: "Leonel",
-                text: "Hago tratos con las estrellas apagadas: les ofrezco todos mis mañanas a cambio de que me devuelvan una sola de tus tardes de lluvia.",
-                image: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?q=80&w=600&auto=format&fit=crop",
-                date: "17 de Junio, 2026",
-                isTextOnly: false
-            },
-            {
-                id: "16",
-                stage: "Depresión",
-                author: "Lucía D.",
-                text: "Hay una niebla espesa y pálida dentro de mi pecho. No hace frío, pero mis costillas tiemblan como si estuvieran hechas de papel mojado.",
-                image: "https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?q=80&w=600&auto=format&fit=crop",
-                date: "05 de Junio, 2026",
-                isTextOnly: false
-            },
-            {
-                id: "17",
-                stage: "Aceptación",
-                author: "Gaby",
-                text: "Hoy el viento sopló y no dolió. Dejé abierta la ventana para que entre la primavera y sentí que tu recuerdo ya no me ahogaba, sino que me hacía flotar.",
-                image: "https://images.unsplash.com/photo-1426604966848-d7adac402bff?q=80&w=600&auto=format&fit=crop",
-                date: "23 de Mayo, 2026",
-                isTextOnly: false
-            },
-            {
-                id: "18",
-                stage: "Negociación",
-                author: "Marcos T.",
-                text: "Si prometo ser mejor persona de ahora en adelante, ¿existirá alguna dimensión paralela donde los minutos retrocedan antes del accidente?",
-                image: "https://images.unsplash.com/photo-1461360370896-922624d12aa1?q=80&w=600&auto=format&fit=crop",
-                date: "02 de Junio, 2026",
-                isTextOnly: false
-            },
-            {
-                id: "19",
-                stage: "Depresión",
-                author: "Clara S.",
-                text: "Todo lo que hago me cuesta el doble de energía. Despertarse es un ejercicio de resistencia contra el peso de tu ausencia.",
-                image: "https://images.unsplash.com/photo-1499209974431-9dddcece7f88?q=80&w=600&auto=format&fit=crop",
-                date: "14 de Mayo, 2026",
-                isTextOnly: false
-            },
-            {
-                id: "20",
-                stage: "Aceptación",
-                author: "Mateo",
-                text: "La vida continuó, de otra manera y con un vacío de fondo, pero continuó. Hoy volví a sonreír de verdad al mirar tu retrato en la biblioteca.",
-                image: "https://images.unsplash.com/photo-1504198453319-5ce911bafcde?q=80&w=600&auto=format&fit=crop",
-                date: "20 de Mayo, 2026",
-                isTextOnly: false
-            }
+            { id: "m1", stage: "Negación", author: "Sofía S.", text: "A veces sigo pensando que vas a abrir la puerta de entrada y saludarme con ese silbido tuyo. Aún no puedo mover tus zapatos del recibidor.", date: "12 de julio de 2026", isTextOnly: true },
+            { id: "m2", stage: "Ira", author: "Anónimo", text: "Me enoja tanto que te hayas ido justo ahora. Teníamos tantos planes para este año. No es justo, simplemente no es justo.", date: "11 de julio de 2026", isTextOnly: true },
+            { id: "m3", stage: "Negociación", author: "Martín", text: "Daría lo que fuera por tener solo cinco minutos más para decirte todo lo que se me quedó atascado en la garganta.", date: "10 de julio de 2026", isTextOnly: true },
+            { id: "m4", stage: "Depresión", author: "Elena", text: "La casa se siente absurdamente grande y silenciosa sin el ruido de tus tazas de café por la mañana. Cuesta encontrar un motivo para levantarme.", date: "09 de julio de 2026", isTextOnly: true },
+            { id: "m5", stage: "Aceptación", author: "Anónimo", text: "Hoy cociné tu tarta favorita y por primera vez en meses no lloré, sonreí recordando cuando te llenabas de harina la nariz. Te extraño en paz.", date: "08 de julio de 2026", isTextOnly: true }
         ];
 
-        // Iniciamos el array cargando primero los datos de respaldo fijos
         let memories = [...INITIAL_MEMORIES];
-        let currentFilter = 'all';
 
-        let scene, camera, renderer, container;
-        let nodes = []; 
-        let particles;
-        let isDragging = false;
-        let previousMousePosition = { x: 0, y: 0 };
-        let targetRotation = { x: 0.1, y: 0.4 };
-        let currentRotation = { x: 0.1, y: 0.4 };
-        let targetZoom = 19;
-        let currentZoom = 45;
-        let raycaster, mouse;
-        let hoveredNode = null;
-        let audioCtx; 
-
-        let mouseParallax = { x: 0, y: 0 };
-        let targetParallax = { x: 0, y: 0 };
-
-        function nextOnboarding() {
-            document.getElementById('onboarding-1').classList.add('opacity-0', 'pointer-events-none', '-translate-y-4');
-            setTimeout(() => {
-                document.getElementById('onboarding-2').classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
-            }, 300);
-        }
-
-        function finishOnboarding() {
-            document.getElementById('onboarding-2').classList.add('opacity-0', 'pointer-events-none', '-translate-y-4');
-            setTimeout(() => {
-                document.getElementById('onboarding-2').style.display = 'none';
-            }, 800);
-        }
-
-        // Descargar los recuerdos de Supabase y unirlos con los de respaldo fijos
-        async function cargarRecuerdosDesdeSupabase() {
+        // INICIALIZACIÓN DE LA BASE DE DATOS
+        async function initSupabase() {
+            if (!supabaseClient) return;
             try {
                 const { data, error } = await supabaseClient
                     .from('recuerdos')
@@ -464,440 +260,236 @@
                 if (data && data.length > 0) {
                     const recuerdosBaseDeDatos = data.map(item => ({
                         id: item.id.toString(),
-                        stage: item.etapa || 'Asignación',
-                        author: item.autor || 'Anónimo',
-                        text: item.texto || item.text || '', 
-                        image: item.imagen,
-                        date: item.fecha || new Intl.DateTimeFormat('es-ES').format(new Date(item.created_at)),
-                        isTextOnly: item.is_text_only !== false
+                        stage: item.stage || 'Asignación',
+                        author: item.author || 'Anónimo',
+                        text: item.text || '', 
+                        image: item.image,
+                        date: item.date || new Intl.DateTimeFormat('es-ES').format(new Date(item.created_at)),
+                        isTextOnly: item.isTextOnly !== false
                     }));
 
-                    // Combinación de Base de datos real + Mockups locales
                     memories = [...recuerdosBaseDeDatos, ...INITIAL_MEMORIES];
                 }
             } catch (err) {
                 console.warn('Error conectando a Supabase, mostrando únicamente los datos de respaldo:', err.message);
             }
+            
+            buildMemorySpace();
+            updateTotalCount();
         }
 
-        window.onload = async function() {
-            lucide.createIcons();
-            
-            // 1. Cargamos de forma asíncrona la base de datos de Supabase y la unimos a los mockups locales
-            await cargarRecuerdosDesdeSupabase();
-            
-            // 2. Ejecutamos la inicialización de Three.js
-            initThree();
-            setupEvents();
-            updateTotalCount();
-            
-            // Transición automática de Pantalla 1 a Pantalla 2 tras un delay de 4 segundos
-            setTimeout(nextOnboarding, 4000);
+        // --- SISTEMA THREE.JS ---
+        let scene, camera, renderer, nodes = [], activeSelection = null;
+        const container = document.getElementById('canvas-container');
+
+        // Rotación de cámara suave
+        let targetRotation = { x: 0, y: 0 };
+        let currentRotation = { x: 0, y: 0 };
+        let targetZoom = 15;
+        let currentZoom = 30;
+        let isDragging = false;
+        let previousMousePosition = { x: 0, y: 0 };
+
+        const COLOR_MAP = {
+            "Negación": 0x6366f1,    // Indigo
+            "Ira": 0xef4444,         // Rojo carmesí
+            "Negociación": 0xf59e0b,  // Ámbar
+            "Depresión": 0x8b5cf6,    // Violeta
+            "Aceptación": 0x10b981,   // Esmeralda
+            "Asignación": 0xd97706   // Ámbar por defecto
         };
 
-        function updateTotalCount() {
-            document.getElementById('total-count').textContent = memories.length;
-        }
-
         function initThree() {
-            container = document.getElementById('canvas-container');
-            
             scene = new THREE.Scene();
-            scene.fog = new THREE.FogExp2(0xffffff, 0.012);
+            scene.fog = new THREE.FogExp2(0x1c1917, 0.035);
 
             camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-            updateCameraPosition();
-
-            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+            
+            renderer = new THREE.WebGLRenderer({ antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.setClearColor(0x1c1917, 1);
             container.appendChild(renderer.domElement);
 
-            create3DSkydome();
-
-            const ambientLight = new THREE.AmbientLight(0xfffbeb, 0.7);
+            // Luces
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.25);
             scene.add(ambientLight);
 
-            const directionalLight = new THREE.DirectionalLight(0xfef08a, 0.5);
-            directionalLight.position.set(10, 25, 20);
-            scene.add(directionalLight);
+            const centerLight = new THREE.PointLight(0xffffff, 1.5, 30);
+            centerLight.position.set(0, 0, 0);
+            scene.add(centerLight);
 
-            const particleGeo = new THREE.BufferGeometry();
-            const particleCount = 500;
-            const posArray = new Float32Array(particleCount * 3);
+            // Partículas de fondo
+            initBackgroundStars();
 
-            for(let i=0; i < particleCount * 3; i++) {
-                posArray[i] = (Math.random() - 0.5) * 110;
-            }
-
-            particleGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+            // Eventos
+            window.addEventListener('resize', onWindowResize);
             
-            const particleMat = new THREE.PointsMaterial({
-                size: 0.12,
-                color: 0x93c5fd, 
-                transparent: true,
-                opacity: 0.45
-            });
+            // Eventos de ratón / táctiles para orbitar
+            renderer.domElement.addEventListener('mousedown', onMouseDown);
+            renderer.domElement.addEventListener('mousemove', onMouseMove);
+            window.addEventListener('mouseup', onMouseUp);
+            renderer.domElement.addEventListener('touchstart', onTouchStart, { passive: true });
+            renderer.domElement.addEventListener('touchmove', onTouchMove, { passive: true });
+            window.addEventListener('touchend', onMouseUp);
 
-            particles = new THREE.Points(particleGeo, particleMat);
-            scene.add(particles);
+            renderer.domElement.addEventListener('click', onCanvasClick);
 
-            raycaster = new THREE.Raycaster();
-            mouse = new THREE.Vector2();
-
-            buildMemorySpace();
             animate();
         }
 
-        function create3DSkydome() {
-            const skyGeo = new THREE.SphereGeometry(180, 32, 32);
+        function initBackgroundStars() {
+            const starsGeometry = new THREE.BufferGeometry();
+            const starsCount = 400;
+            const positions = new Float32Array(starsCount * 3);
+            const colors = new Float32Array(starsCount * 3);
 
-            const vertexShader = `
-                varying vec3 vPosition;
-                void main() {
-                    vPosition = position;
-                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-                }
-            `;
+            for(let i = 0; i < starsCount * 3; i += 3) {
+                const radius = 25 + Math.random() * 40;
+                const theta = Math.random() * Math.PI * 2;
+                const phi = Math.acos((Math.random() * 2) - 1);
 
-            const fragmentShader = `
-                varying vec3 vPosition;
-                void main() {
-                    float h = normalize(vPosition).y;
-                    vec3 celestePuro = vec3(147.0/255.0, 197.0/255.0, 253.0/255.0);
-                    vec3 celesteClaro = vec3(219.0/255.0, 234.0/255.0, 254.0/255.0);
-                    vec3 blancoMisty = vec3(1.0, 1.0, 1.0);
-                    vec3 amarilloHorizonte = vec3(190.0/255.0, 215.0/255.0, 131.0/255.0);
-                    
-                    vec3 finalColor;
-                    float absH = abs(h);
-                    
-                    if (absH < 0.12) {
-                        finalColor = mix(amarilloHorizonte, blancoMisty, absH / 0.12);
-                    } else if (absH < 0.45) {
-                        finalColor = mix(blancoMisty, celesteClaro, (absH - 0.12) / 0.33);
-                    } else {
-                        finalColor = mix(celesteClaro, celestePuro, (absH - 0.45) / 0.55);
-                    }
-                    gl_FragColor = vec4(finalColor, 1.0);
-                }
-            `;
+                positions[i] = radius * Math.sin(phi) * Math.cos(theta);
+                positions[i+1] = radius * Math.sin(phi) * Math.sin(theta);
+                positions[i+2] = radius * Math.cos(phi);
 
-            const skyMat = new THREE.ShaderMaterial({
-                vertexShader: vertexShader,
-                fragmentShader: fragmentShader,
-                side: THREE.BackSide,
-                depthWrite: false
+                colors[i] = 0.5; colors[i+1] = 0.5; colors[i+2] = 0.55;
+            }
+
+            starsGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            starsGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+            const starsMaterial = new THREE.PointsMaterial({
+                size: 0.1,
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.3
             });
 
-            const skydome = new THREE.Mesh(skyGeo, skyMat);
-            scene.add(skydome);
+            const starField = new THREE.Points(starsGeometry, starsMaterial);
+            scene.add(starField);
         }
 
         function buildMemorySpace() {
+            // Eliminar nodos anteriores de la escena
             nodes.forEach(node => scene.remove(node.mesh));
             nodes = [];
 
-            memories.forEach((memory, idx) => {
-                const phi = Math.acos(-1 + (2 * idx) / memories.length);
-                const theta = Math.sqrt(memories.length * Math.PI) * phi;
+            // Generar distribución en espiral esférica (Fibonacci Lattice)
+            const count = memories.length;
+            for (let i = 0; i < count; i++) {
+                const memory = memories[i];
                 
-                const radius = 13 + Math.random() * 4;
+                // Distribución matemática armoniosa
+                const phi = Math.acos(1 - 2 * (i + 0.5) / count);
+                const theta = Math.PI * (1 + Math.sqrt(5)) * (i + 0.5);
+                const radius = 6 + Math.sin(i * 0.2) * 2; // Radio variable
+
                 const x = radius * Math.sin(phi) * Math.cos(theta);
-                const y = radius * Math.sin(phi) * Math.sin(theta) * 0.42; 
+                const y = radius * Math.sin(phi) * Math.sin(theta);
                 const z = radius * Math.cos(phi);
 
-                let geometry;
-                let material;
-                let texture = null;
+                const colorValue = COLOR_MAP[memory.stage] || 0xd97706;
 
-                if (memory.isTextOnly || !memory.image) {
-                    const canvas = document.createElement('canvas');
-                    canvas.width = 512;
-                    canvas.height = 128;
-                    const ctx = canvas.getContext('2d');
-                    
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    ctx.fillStyle = '#171717';
-                    ctx.font = '500 24px -apple-system, sans-serif';
-                    ctx.textAlign = 'center';
-                    ctx.textBaseline = 'middle';
-                    
-                    let txt = memory.text;
-                    if(txt.length > 45) txt = txt.substring(0, 42) + "...";
-                    
-                    ctx.fillText(txt, canvas.width / 2, canvas.height / 2);
-                    
-                    texture = new THREE.CanvasTexture(canvas);
-                    geometry = new THREE.PlaneGeometry(4.5, 1.125);
-                    
-                    material = new THREE.MeshBasicMaterial({
-                        map: texture,
-                        side: THREE.DoubleSide,
-                        transparent: true,
-                        opacity: 0.95
-                    });
-                } else {
-                    const textureLoader = new THREE.TextureLoader();
-                    textureLoader.crossOrigin = "anonymous";
-                    
-                    try {
-                        texture = textureLoader.load(memory.image);
-                    } catch(e) {}
-
-                    geometry = new THREE.PlaneGeometry(3.6, 2.7);
-                    material = new THREE.MeshBasicMaterial({
-                        map: texture,
-                        side: THREE.DoubleSide,
-                        color: 0xffffff,
-                        transparent: true,
-                        opacity: 0.85
-                    });
-
-                    if(!texture) material.color.setHex(0xe5e5e5);
-                }
-
+                // Crear el mesh del nodo (Núcleo luminoso)
+                const geometry = new THREE.SphereGeometry(0.12, 16, 16);
+                const material = new THREE.MeshBasicMaterial({
+                    color: colorValue,
+                    transparent: true,
+                    opacity: 0.8
+                });
                 const mesh = new THREE.Mesh(geometry, material);
                 mesh.position.set(x, y, z);
-                mesh.lookAt(0, 0, 0); 
-                
-                mesh.userData = { 
-                    id: memory.id, 
-                    stage: memory.stage,
-                    text: memory.text,
-                    author: memory.author,
-                    date: memory.date,
-                    image: memory.image,
-                    isTextOnly: memory.isTextOnly,
-                    originalPos: new THREE.Vector3(x, y, z),
-                    targetPos: new THREE.Vector3(x, y, z),
-                    scale: 1
-                };
+                mesh.userData = memory;
 
-                const edges = new THREE.EdgesGeometry(geometry);
-                const lineMat = new THREE.LineBasicMaterial({ 
-                    color: 0x171717, 
-                    transparent: true, 
-                    opacity: (memory.isTextOnly ? 0.03 : 0.15) 
+                // Crear el aura brillante
+                const auraGeometry = new THREE.SphereGeometry(0.35, 16, 16);
+                const auraMaterial = new THREE.MeshBasicMaterial({
+                    color: colorValue,
+                    transparent: true,
+                    opacity: 0.15,
+                    blending: THREE.AdditiveBlending
                 });
-                const line = new THREE.LineSegments(edges, lineMat);
-                mesh.add(line);
+                const aura = new THREE.Mesh(auraGeometry, auraMaterial);
+                mesh.add(aura);
 
                 scene.add(mesh);
-                nodes.push({
-                    mesh: mesh,
-                    material: material,
-                    line: line,
-                    data: memory
-                });
-            });
-        }
-
-        function updateCameraPosition() {
-            const posX = currentZoom * Math.sin(currentRotation.y) * Math.cos(currentRotation.x) + targetParallax.x;
-            const posY = currentZoom * Math.sin(currentRotation.x) + targetParallax.y;
-            const posZ = currentZoom * Math.cos(currentRotation.y) * Math.cos(currentRotation.x);
-
-            camera.position.set(posX, posY, posZ);
-            camera.lookAt(0, 0, 0);
-        }
-
-        function resetCamera() {
-            targetRotation.x = 0.1;
-            targetRotation.y = 0.4;
-            targetZoom = 19;
-            targetParallax.x = 0;
-            targetParallax.y = 0;
-            playChime(329.63, 'sine', 0.1); 
-        }
-
-        function filterStage(stage) {
-            currentFilter = stage;
-            const buttons = document.querySelectorAll('.filter-btn');
-            buttons.forEach(btn => {
-                btn.classList.remove('active', 'bg-neutral-900', 'text-white');
-                btn.classList.add('bg-white/70', 'text-neutral-700');
-            });
-
-            event.target.classList.add('active', 'bg-neutral-900', 'text-white');
-            event.target.classList.remove('bg-white/70', 'text-neutral-700');
-
-            let visibleIndex = 0;
-            nodes.forEach(node => {
-                const isVisible = (stage === 'all' || node.data.stage === stage);
-                if (isVisible) {
-                    node.mesh.visible = true;
-                    const phi = Math.acos(-1 + (2 * visibleIndex) / memories.filter(m => stage === 'all' || m.stage === stage).length);
-                    const theta = Math.sqrt(memories.length * Math.PI) * phi;
-                    const radius = 12 + Math.random() * 3;
-                    
-                    node.mesh.userData.targetPos.set(
-                        radius * Math.sin(phi) * Math.cos(theta),
-                        radius * Math.sin(phi) * Math.sin(theta) * 0.42,
-                        radius * Math.cos(phi)
-                    );
-                    node.mesh.userData.scale = 1.0;
-                    visibleIndex++;
-                } else {
-                    node.mesh.userData.targetPos.set(0, -35, 0); 
-                    node.mesh.userData.scale = 0.0;
-                }
-            });
-            playChime(220, 'triangle', 0.1);
+                nodes.push({ mesh, memory });
+            }
         }
 
         function animate() {
             requestAnimationFrame(animate);
 
+            // Interpolación de cámara suave (lerp)
             currentRotation.x += (targetRotation.x - currentRotation.x) * 0.05;
             currentRotation.y += (targetRotation.y - currentRotation.y) * 0.05;
             currentZoom += (targetZoom - currentZoom) * 0.05;
 
-            targetParallax.x += (mouseParallax.x - targetParallax.x) * 0.04;
-            targetParallax.y += (mouseParallax.y - targetParallax.y) * 0.04;
+            // Posicionar la cámara orbitando el centro
+            camera.position.x = currentZoom * Math.sin(currentRotation.y) * Math.cos(currentRotation.x);
+            camera.position.y = currentZoom * Math.sin(currentRotation.x);
+            camera.position.z = currentZoom * Math.cos(currentRotation.y) * Math.cos(currentRotation.x);
+            camera.lookAt(0, 0, 0);
 
-            updateCameraPosition();
-
-            if (particles) {
-                particles.rotation.y += 0.0001;
-                particles.rotation.x += 0.00005;
-            }
-
+            // Animación sutil de las auras
+            const time = Date.now() * 0.001;
             nodes.forEach((node, idx) => {
-                node.mesh.position.lerp(node.mesh.userData.targetPos, 0.04);
-
-                const currentScale = node.mesh.scale.x;
-                const targetScale = node.mesh.userData.scale;
-                const newScale = currentScale + (targetScale - currentScale) * 0.08;
-                node.mesh.scale.set(newScale, newScale, newScale);
-
-                if(newScale < 0.05 && node.mesh.userData.scale === 0) {
-                    node.mesh.visible = false;
+                const scale = 1 + Math.sin(time * 2 + idx) * 0.15;
+                if (node.mesh.children[0]) {
+                    node.mesh.children[0].scale.set(scale, scale, scale);
                 }
-
-                if (node.mesh.visible) {
-                    const time = Date.now() * 0.0008;
-                    const offset = parseInt(node.mesh.userData.id) || idx * 0.3;
-                    node.mesh.position.y += Math.sin(time + offset) * 0.003;
+                
+                // Si está seleccionado, brilla más fuerte
+                if (activeSelection && activeSelection.id === node.memory.id) {
+                    node.mesh.material.opacity = 1.0;
+                    node.mesh.scale.set(1.5, 1.5, 1.5);
+                } else {
+                    node.mesh.material.opacity = 0.6 + Math.sin(time + idx * 0.5) * 0.2;
+                    node.mesh.scale.set(1, 1, 1);
                 }
-                node.mesh.lookAt(camera.position);
             });
 
             renderer.render(scene, camera);
         }
 
-        function setupEvents() {
-            container.addEventListener('mousedown', onMouseDown);
-            container.addEventListener('mousemove', onMouseMove);
-            window.addEventListener('mouseup', onMouseUp);
-            container.addEventListener('wheel', onDocumentWheel, { passive: false });
-            container.addEventListener('touchstart', onTouchStart, { passive: true });
-            container.addEventListener('touchmove', onTouchMove, { passive: false });
-            container.addEventListener('touchend', onTouchEnd);
-            container.addEventListener('click', onCanvasClick);
-            window.addEventListener('resize', onWindowResize);
-            window.addEventListener('mousemove', onScreenMouseMove);
-            window.addEventListener('keydown', onKeyDown);
-
-            const dropZone = document.getElementById('drop-zone');
-            dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('bg-neutral-100'); });
-            dropZone.addEventListener('dragleave', () => { dropZone.classList.remove('bg-neutral-100'); });
-            dropZone.addEventListener('drop', (e) => { e.preventDefault(); dropZone.classList.remove('bg-neutral-100'); });
-        }
-
-        function onScreenMouseMove(e) {
-            mouseParallax.x = -((e.clientX / window.innerWidth) - 0.5) * 4.5;
-            mouseParallax.y = ((e.clientY / window.innerHeight) - 0.5) * 3.5;
-        }
-
-        function onMouseDown(e) { isDragging = true; previousMousePosition = { x: e.clientX, y: e.clientY }; }
-        function onMouseMove(e) {
-            if (!isDragging) { checkHover(e.clientX, e.clientY); return; }
-            const deltaMove = { x: e.clientX - previousMousePosition.x, y: e.clientY - previousMousePosition.y };
-            targetRotation.y -= deltaMove.x * 0.005;
-            targetRotation.x = Math.max(-Math.PI/3.5, Math.min(Math.PI/3.5, targetRotation.x - deltaMove.y * 0.005));
+        // --- MANEJO DE INTERACCIÓN Y NAVEGACIÓN ---
+        function onMouseDown(e) {
+            isDragging = true;
             previousMousePosition = { x: e.clientX, y: e.clientY };
         }
-        function onMouseUp() { isDragging = false; }
-        function onDocumentWheel(e) { e.preventDefault(); targetZoom = Math.max(10, Math.min(50, targetZoom + e.deltaY * 0.03)); }
 
-        let touchStartDist = 0;
-        function onTouchStart(e) {
-            isDragging = true;
-            if (e.touches.length === 1) previousMousePosition = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-            else if (e.touches.length === 2) touchStartDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
-        }
-        function onTouchMove(e) {
+        function onMouseMove(e) {
             if (!isDragging) return;
-            e.preventDefault();
-            if (e.touches.length === 1) {
-                const deltaMove = { x: e.touches[0].clientX - previousMousePosition.x, y: e.touches[0].clientY - previousMousePosition.y };
-                targetRotation.y -= deltaMove.x * 0.006;
-                targetRotation.x = Math.max(-Math.PI/3.5, Math.min(Math.PI/3.5, targetRotation.x - deltaMove.y * 0.006));
+            const deltaX = e.clientX - previousMousePosition.x;
+            const deltaY = e.clientY - previousMousePosition.y;
+
+            targetRotation.y -= deltaX * 0.005;
+            targetRotation.x = Math.max(-Math.PI/2.5, Math.min(Math.PI/2.5, targetRotation.x - deltaY * 0.005));
+
+            previousMousePosition = { x: e.clientX, y: e.clientY };
+        }
+
+        function onTouchStart(e) {
+            if(e.touches.length === 1) {
+                isDragging = true;
                 previousMousePosition = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-            } else if (e.touches.length === 2) {
-                const dist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
-                targetZoom = Math.max(10, Math.min(50, targetZoom + (touchStartDist - dist) * 0.15));
-                touchStartDist = dist;
-            }
-        }
-        function onTouchEnd() { isDragging = false; }
-        function onKeyDown(e) {
-            if (e.key === 'ArrowLeft') targetRotation.y -= 0.15;
-            else if (e.key === 'ArrowRight') targetRotation.y += 0.15;
-            else if (e.key === 'ArrowUp') targetZoom = Math.max(10, targetZoom - 2);
-            else if (e.key === 'ArrowDown') targetZoom = Math.min(50, targetZoom + 2);
-        }
-
-        function checkHover(clientX, clientY) {
-            mouse.x = (clientX / window.innerWidth) * 2 - 1;
-            mouse.y = -(clientY / window.innerHeight) * 2 + 1;
-            raycaster.setFromCamera(mouse, camera);
-            const intersects = raycaster.intersectObjects(nodes.map(n => n.mesh));
-
-            if (intersects.length > 0) {
-                const hitNode = intersects[0].object;
-                if (hoveredNode !== hitNode) {
-                    if (hoveredNode) resetNodeVisual(hoveredNode);
-                    hoveredNode = hitNode;
-                    hitNode.material.opacity = 1.0;
-                    hitNode.children[0].material.opacity = 0.8;
-                    hitNode.children[0].material.color.setHex(0xf59e0b); 
-                    document.body.style.cursor = 'pointer';
-                }
-            } else {
-                if (hoveredNode) { resetNodeVisual(hoveredNode); hoveredNode = null; }
-                document.body.style.cursor = 'default';
             }
         }
 
-        function resetNodeVisual(node) {
-            if (!node) return;
-            node.material.opacity = node.userData.isTextOnly ? 0.95 : 0.85;
-            if (node.children[0]) {
-                node.children[0].material.opacity = node.userData.isTextOnly ? 0.03 : 0.15;
-                node.children[0].material.color.setHex(0x171717);
-            }
+        function onTouchMove(e) {
+            if (!isDragging || e.touches.length !== 1) return;
+            const deltaX = e.touches[0].clientX - previousMousePosition.x;
+            const deltaY = e.touches[0].clientY - previousMousePosition.y;
+
+            targetRotation.y -= deltaX * 0.007;
+            targetRotation.x = Math.max(-Math.PI/2.5, Math.min(Math.PI/2.5, targetRotation.x - deltaY * 0.007));
+
+            previousMousePosition = { x: e.touches[0].clientX, y: e.touches[0].clientY };
         }
 
-        function onCanvasClick(e) {
-            if (isDragging) return;
-            mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
-            mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
-            raycaster.setFromCamera(mouse, camera);
-            const intersects = raycaster.intersectObjects(nodes.map(n => n.mesh));
-
-            if (intersects.length > 0) {
-                const selectedMesh = intersects[0].object;
-                const nodePos = selectedMesh.position;
-                targetZoom = 13;
-                targetRotation.y = Math.atan2(nodePos.x, nodePos.z);
-                targetRotation.x = Math.asin(nodePos.y / nodePos.length()) * 0.8;
-                showMemoryDetail(selectedMesh.userData);
-                playChime(440, 'sine', 0.1); 
-            } else {
-                closeDetailPanel();
-            }
+        function onMouseUp() {
+            isDragging = false;
         }
 
         function onWindowResize() {
@@ -906,57 +498,143 @@
             renderer.setSize(window.innerWidth, window.innerHeight);
         }
 
-        function showMemoryDetail(data) {
-            const panel = document.getElementById('detail-panel');
-            panel.classList.remove('translate-x-full');
-            document.getElementById('detail-tag').textContent = data.stage;
-            document.getElementById('detail-text').textContent = `"${data.text}"`;
-            document.getElementById('detail-author').textContent = `— Por ${data.author || 'Anónimo'}`;
-            document.getElementById('detail-date').textContent = `Sembrado el ${data.date}`;
-            document.getElementById('detail-id').textContent = `#00${data.id}`;
+        // Raycasting para hacer clics sobre los recuerdos tridimensionales
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
 
-            const imgWrapper = document.getElementById('detail-image-wrapper');
-            if (data.isTextOnly || !data.image) imgWrapper.classList.add('hidden');
-            else { imgWrapper.classList.remove('hidden'); document.getElementById('detail-image').src = data.image; }
-        }
+        function onCanvasClick(e) {
+            // No disparar clics si estábamos arrastrando la cámara de forma evidente
+            if (isDragging) return;
 
-        function closeDetailPanel() { document.getElementById('detail-panel').classList.add('translate-x-full'); }
-        function openUploadModal() {
-            const modal = document.getElementById('upload-modal');
-            modal.classList.remove('opacity-0', 'pointer-events-none');
-            modal.children[0].classList.remove('scale-95');
-            playChime(523.25, 'triangle', 0.05);
-        }
-        function closeUploadModal() {
-            const modal = document.getElementById('upload-modal');
-            modal.classList.add('opacity-0', 'pointer-events-none');
-            modal.children[0].classList.add('scale-95');
-            resetForm();
-        }
+            mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
 
-        let loadedBase64 = null;
-        function previewImage(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    loadedBase64 = e.target.result;
-                    document.getElementById('image-preview').src = loadedBase64;
-                    document.getElementById('preview-placeholder').classList.add('hidden');
-                    document.getElementById('preview-container').classList.remove('hidden');
-                };
-                reader.readAsDataURL(file);
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(nodes.map(n => n.mesh));
+
+            if (intersects.length > 0) {
+                const selectedMesh = intersects[0].object;
+                const memoryData = selectedMesh.userData;
+
+                // Zoom e inclinación hacia el nodo seleccionado
+                const nodePos = selectedMesh.position;
+                targetZoom = 13;
+                targetRotation.y = Math.atan2(nodePos.x, nodePos.z);
+                targetRotation.x = Math.asin(nodePos.y / nodePos.length()) * 0.8;
+
+                showMemoryDetail(memoryData);
+                playChime(440 + Math.random() * 200, 'triangle', 0.1);
             }
         }
 
-        function resetForm() {
-            document.getElementById('memory-form').reset();
-            document.getElementById('preview-placeholder').classList.remove('hidden');
-            document.getElementById('preview-container').classList.add('hidden');
-            loadedBase64 = null;
+        // --- INTERFAZ DE DETALLES Y UI ---
+        function showMemoryDetail(memory) {
+            activeSelection = memory;
+            
+            const panel = document.getElementById('detail-panel');
+            const badge = document.getElementById('detail-stage-badge');
+            
+            document.getElementById('detail-text').textContent = memory.text;
+            document.getElementById('detail-author').textContent = memory.author;
+            document.getElementById('detail-date').textContent = memory.date;
+
+            // Manejo de la categoría y colores
+            badge.textContent = memory.stage;
+            const colors = {
+                "Negación": "bg-indigo-500/20 text-indigo-300 border-indigo-500/40",
+                "Ira": "bg-red-500/20 text-red-300 border-red-500/40",
+                "Negociación": "bg-amber-500/20 text-amber-300 border-amber-500/40",
+                "Depresión": "bg-purple-500/20 text-purple-300 border-purple-500/40",
+                "Aceptación": "bg-emerald-500/20 text-emerald-300 border-emerald-500/40"
+            };
+            badge.className = `px-3 py-1 rounded-full text-xs font-semibold tracking-wider uppercase border ${colors[memory.stage] || 'bg-stone-500/20 text-stone-300'}`;
+
+            // Mostrar u ocultar la imagen asociada
+            const imgContainer = document.getElementById('detail-image-container');
+            const imgElement = document.getElementById('detail-image');
+            
+            if (memory.image && memory.isTextOnly === false) {
+                imgElement.src = memory.image;
+                imgContainer.classList.remove('hidden');
+            } else {
+                imgContainer.classList.add('hidden');
+                imgElement.src = "";
+            }
+
+            // Desplegar panel lateral
+            panel.classList.remove('translate-x-full');
         }
 
-        // Envío asíncrono a Supabase con desactivación de dobles clics
+        function closeDetailPanel() {
+            activeSelection = null;
+            document.getElementById('detail-panel').classList.add('translate-x-full');
+            targetZoom = 15;
+        }
+
+        function openUploadModal() {
+            const modal = document.getElementById('upload-modal');
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+        }
+
+        function closeUploadModal() {
+            const modal = document.getElementById('upload-modal');
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            // Resetear el formulario
+            document.getElementById('form-text').value = "";
+            document.getElementById('form-author').value = "";
+            document.getElementById('form-stage').selectedIndex = 0;
+            clearPreviewImage();
+        }
+
+        function openInfoModal() {
+            document.getElementById('info-modal').classList.remove('opacity-0', 'pointer-events-none');
+        }
+
+        function closeInfoModal() {
+            document.getElementById('info-modal').classList.add('opacity-0', 'pointer-events-none');
+        }
+
+        function updateTotalCount() {
+            document.getElementById('total-memories-count').textContent = memories.length;
+        }
+
+        // --- MANEJO DE IMÁGENES ---
+        let loadedBase64 = null;
+
+        function previewImage(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // Validación de peso (Límite sugerido 1MB para persistir strings Base64)
+            if (file.size > 1024 * 1024 * 1.5) {
+                alert("La imagen es un poco pesada. Por favor sube una menor a 1.5 MB.");
+                event.target.value = "";
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                loadedBase64 = e.target.result;
+                document.getElementById('image-upload-prompt').classList.add('hidden');
+                document.getElementById('image-upload-preview').classList.remove('hidden');
+                document.getElementById('preview-img-element').src = loadedBase64;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function clearPreviewImage(event) {
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            loadedBase64 = null;
+            document.getElementById('form-image').value = "";
+            document.getElementById('image-upload-prompt').classList.remove('hidden');
+            document.getElementById('image-upload-preview').classList.add('hidden');
+            document.getElementById('preview-img-element').src = "";
+        }
+
+        // --- ENVIAR RECUERDO A SUPABASE ---
         async function handleFormSubmit(event) {
             event.preventDefault();
             
@@ -980,17 +658,18 @@
             const date = new Intl.DateTimeFormat('es-ES', { day: '2-digit', month: 'long', year: 'numeric' }).format(new Date());
 
             try {
-                // Hacemos el Insert usando los nombres exactos de tus columnas en Supabase
+                if (!supabaseClient) throw new Error("Cliente de Supabase no inicializado");
+
                 const { data, error } = await supabaseClient
                     .from('recuerdos')
                     .insert([
                         {
-                            stage: stage,          // Cambiado 'etapa' por 'stage'
-                            author: author,        // Cambiado 'autor' por 'author'
-                            text: text,            // Cambiado 'texto' por 'text'
-                            image: image,          // Cambiado 'imagen' por 'image'
-                            date: date,            // Se mantiene 'date'
-                            isTextOnly: isTextOnly // Cambiado 'is_text_only' por 'isTextOnly'
+                            stage: stage,
+                            author: author,
+                            text: text,
+                            image: image,
+                            date: date,
+                            isTextOnly: isTextOnly
                         }
                     ])
                     .select();
@@ -1010,10 +689,10 @@
                     isTextOnly: nuevoRegistro.isTextOnly 
                 };
                 
-                // Lo agregamos al principio de nuestra lista activa de recuerdos
+                // Agregarlo a la lista de recuerdos activa en pantalla
                 memories.unshift(newMemory);
 
-                // Reconstruimos los nodos en 3D
+                // Reconstruir los nodos en 3D
                 buildMemorySpace();
                 updateTotalCount();
                 closeUploadModal();
@@ -1021,13 +700,13 @@
 
                 // Viajar automáticamente con la cámara hacia el nodo recién plantado
                 setTimeout(() => {
-                    const targetNode = nodes.find(n => n.data.id === idGenerado);
+                    const targetNode = nodes.find(n => n.data && n.data.id === idGenerado || n.memory && n.memory.id === idGenerado);
                     if (targetNode) {
                         const nodePos = targetNode.mesh.position;
                         targetZoom = 13;
                         targetRotation.y = Math.atan2(nodePos.x, nodePos.z);
                         targetRotation.x = Math.asin(nodePos.y / nodePos.length()) * 0.8;
-                        showMemoryDetail(targetNode.mesh.userData);
+                        showMemoryDetail(targetNode.memory);
                     }
                 }, 600);
 
@@ -1042,31 +721,43 @@
             }
         }
 
-        let isAudioOn = false, ambientOscillator = null, ambientGain = null;
-        function toggleAmbientAudio() {
-            isAudioOn = !isAudioOn;
-            const statusEl = document.getElementById('sound-status');
-            const iconEl = document.getElementById('sound-icon');
-            if (isAudioOn) {
-                statusEl.textContent = "Audio: ON"; statusEl.classList.add('text-amber-600');
-                iconEl.setAttribute('data-lucide', 'volume-2'); lucide.createIcons();
-                startAmbientPad(); showToast("Entorno sonoro activado");
+        // --- SISTEMA DE AUDIO (AUDIO AMBIENTAL POÉTICO) ---
+        let audioCtx, ambientOscillator, ambientGain, isAudioPlaying = false;
+
+        function toggleAudio() {
+            const btn = document.getElementById('audio-toggle-btn');
+            const icon = document.getElementById('audio-icon');
+
+            if (!isAudioPlaying) {
+                // Iniciar audio
+                startAmbientPad();
+                icon.setAttribute('data-lucide', 'volume-2');
+                btn.classList.add('bg-indigo-900/30', 'border-indigo-500/50', 'text-indigo-300');
+                showToast("Música ambiental activada");
+                isAudioPlaying = true;
             } else {
-                statusEl.textContent = "Audio: OFF"; statusEl.classList.remove('text-amber-600');
-                iconEl.setAttribute('data-lucide', 'volume-x'); lucide.createIcons();
+                // Detener audio
                 stopAmbientPad();
+                icon.setAttribute('data-lucide', 'volume-x');
+                btn.className = "w-11 h-11 rounded-full border border-stone-700 bg-stone-900/80 hover:bg-stone-800 flex items-center justify-center text-stone-300 transition duration-300";
+                isAudioPlaying = false;
             }
+            lucide.createIcons(); // Forzar renderizado de iconos
         }
 
-        function playChime(frequency, type = 'sine', duration = 0.2) {
-            if (!isAudioOn) return;
+        function playChime(freq = 440, type = 'sine', duration = 0.15) {
+            if (!isAudioPlaying) return;
             try {
                 const context = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
                 if (!audioCtx) audioCtx = context;
+                
                 const osc = context.createOscillator();
                 const gainNode = context.createGain();
-                osc.type = type; osc.frequency.value = frequency;
-                gainNode.gain.setValueAtTime(0.12, context.currentTime);
+                
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, context.currentTime);
+                
+                gainNode.gain.setValueAtTime(0.08, context.currentTime);
                 gainNode.gain.exponentialRampToValueAtTime(0.0001, context.currentTime + duration * 6);
                 osc.connect(gainNode); gainNode.connect(context.destination);
                 osc.start(); osc.stop(context.currentTime + duration * 6);
@@ -1093,6 +784,13 @@
             toast.classList.remove('opacity-0', 'pointer-events-none');
             setTimeout(() => { toast.classList.add('opacity-0', 'pointer-events-none'); }, 3000);
         }
+
+        // Iniciar la carga
+        window.addEventListener('load', () => {
+            initThree();
+            initSupabase();
+            lucide.createIcons();
+        });
     </script>
 </body>
 </html>
