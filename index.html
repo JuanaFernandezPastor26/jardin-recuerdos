@@ -452,33 +452,34 @@
         }
 
         // Descargar los recuerdos de Supabase y unirlos con los de respaldo fijos
-        async function cargarRecuerdosDesdeSupabase() {
-            try {
-                const { data, error } = await supabaseClient
-                    .from('recuerdos')
-                    .select('*')
-                    .order('created_at', { ascending: false });
+        // CÓDIGO CORREGIDO (Alineado con tu nueva base de datos)
+async function cargarRecuerdosDesdeSupabase() {
+    try {
+        const { data, error } = await supabaseClient
+            .from('recuerdos')
+            .select('*')
+            .order('created_at', { ascending: false });
 
-                if (error) throw error;
+        if (error) throw error;
 
-                if (data && data.length > 0) {
-                    const recuerdosBaseDeDatos = data.map(item => ({
-                        id: item.id.toString(),
-                        stage: item.etapa || 'Asignación',
-                        author: item.autor || 'Anónimo',
-                        text: item.texto || item.text || '', 
-                        image: item.imagen,
-                        date: item.fecha || new Intl.DateTimeFormat('es-ES').format(new Date(item.created_at)),
-                        isTextOnly: item.is_text_only !== false
-                    }));
+        if (data && data.length > 0) {
+            const recuerdosBaseDeDatos = data.map(item => ({
+                id: item.id.toString(),
+                stage: item.stage || 'Asignación',
+                author: item.author || 'Anónimo',
+                text: item.text || '', 
+                image: item.image,
+                date: item.date || new Intl.DateTimeFormat('es-ES').format(new Date(item.created_at)),
+                isTextOnly: item.isTextOnly !== false
+            }));
 
-                    // Combinación de Base de datos real + Mockups locales
-                    memories = [...recuerdosBaseDeDatos, ...INITIAL_MEMORIES];
-                }
-            } catch (err) {
-                console.warn('Error conectando a Supabase, mostrando únicamente los datos de respaldo:', err.message);
-            }
+            // Combinación de Base de datos real + Mockups locales
+            memories = [...recuerdosBaseDeDatos, ...INITIAL_MEMORIES];
         }
+    } catch (err) {
+        console.warn('Error conectando a Supabase, mostrando únicamente los datos de respaldo:', err.message);
+    }
+}
 
         window.onload = async function() {
             lucide.createIcons();
