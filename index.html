@@ -1081,7 +1081,7 @@ async function cargarRecuerdosDesdeSupabase() {
                 ambientOscillator = context.createOscillator();
                 ambientGain = context.createGain();
                 ambientOscillator.type = 'sine'; ambientOscillator.frequency.value = 110; 
-                ambientGain.gain.setValueAtTime(0.02, context.currentTime);
+                ambientGain.gain.setValueAtTime(0.08, context.currentTime);
                 ambientOscillator.connect(ambientGain); ambientGain.connect(context.destination);
                 ambientOscillator.start();
             } catch(e) {}
